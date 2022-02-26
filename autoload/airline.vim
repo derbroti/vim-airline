@@ -256,8 +256,10 @@ function! airline#check_mode(winnr)
       else
         let w:airline_sub_mode = get(w:, 'airline_last_m', '')[2] . '-'
       endif
-    " reset submode when going popping mode stack
-    elseif (join(mode) ==# 'normal' || (mode[0] =~# '\v(insert|replac)' &&
+    elseif (m[0] ==# 'i' && get(w:, 'airline_last_m', '')[0] =~ '\v(v|V||s|S|)')
+      let w:airline_sub_mode = 'I-'
+    " reset submode when popping mode stack
+    elseif (mode[0] ==# 'normal' || (mode[0] =~# '\v(insert|replace)' &&
         \ get(w:, 'airline_lastmode', '')[0:5] ==# 'visual'))
       let w:airline_sub_mode = ''
     endif
