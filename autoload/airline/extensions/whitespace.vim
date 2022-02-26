@@ -142,7 +142,17 @@ function! airline#extensions#whitespace#check()
       endif
     endif
   endif
-  return airline#util#shorten(b:airline_whitespace_check, 120, 9)
+  if strlen(b:airline_whitespace_check)
+    let l:exptab = ' '
+  else
+    let l:exptab = ''
+  endif
+  if !&expandtab
+    let l:exptab .= '↹'
+  else
+    let l:exptab = ''
+  endif
+  return airline#util#shorten(b:airline_whitespace_check, 120, 9) . l:exptab
 endfunction
 
 function! airline#extensions#whitespace#toggle()

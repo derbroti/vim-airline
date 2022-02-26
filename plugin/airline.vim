@@ -152,7 +152,8 @@ function! s:airline_toggle()
         " do not trigger FocusGained on startup, it might erase the intro screen (see #1817)
         " needs funcref() (needs 7.4.2137) and timers (7.4.1578)
         let Handler=funcref('<sid>FocusGainedHandler')
-        let s:timer=timer_start(5000, Handler)
+        " derbroti 2022: at least for me, 500 is enough...
+        let s:timer=timer_start(500, Handler)
       else
         autocmd FocusGained * call <sid>on_focus_gained()
       endif

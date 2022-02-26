@@ -222,21 +222,22 @@ function! airline#check_mode(winnr)
 
   if get(w:, 'airline_active', 1)
     let m = mode(1)
-    " Refer :help mode() to see the list of modes 
-    "   NB: 'let mode' here refers to the display colour _groups_, 
+    " Refer :help mode() to see the list of modes
+    "   NB: 'let mode' here refers to the display colour _groups_,
     "   not the literal mode's code (i.e., m). E.g., Select modes
     "   v, S and ^V use 'visual' since they are of similar ilk.
-    "   Some modes do not get recognised for status line purposes: 
+    "   Some modes do not get recognised for status line purposes:
     "   no, nov, noV, no^V, !, cv, and ce.
-    "   Mode name displayed is handled in init.vim (g:airline_mode_map). 
-    " 
+    "   Mode name displayed is handled in init.vim (g:airline_mode_map).
+    "
     if m[0] ==# "i"
       let mode = ['insert']  " Insert modes + submodes (i, ic, ix)
-    elseif m[0] == "R"  
-      let mode = ['replace']  " Replace modes + submodes (R, Rc, Rv, Rx) (NB: case sensitive as 'r' is a mode)
+    " derbroti 2022 - only check first 2 chars, as there are 3 leter Rv modes
+    elseif m[0] == "R"
+      let mode =['replace']  " Replace modes + submodes (R, Rc, Rv, Rx) (NB: case sensitive as 'r' is a mode)
     elseif m[0] =~ '\v(v|V||s|S|)'
-        let mode = ['visual']  " Visual and Select modes (v, V, ^V, s, S, ^S))
-    elseif m ==# "t"  
+      let mode = ['visual']  " Visual and Select modes (v, V, ^V, s, S, ^S))
+    elseif m ==# "t"
       let mode = ['terminal']  " Terminal mode (only has one mode (t))
     elseif m[0] =~ '\v(c|r|!)'
       let mode = ['commandline']  " c, cv, ce, r, rm, r? (NB: cv and ce stay showing as mode entered from)
@@ -247,11 +248,29 @@ function! airline#check_mode(winnr)
       " Vim plugin Multiple Cursors https://github.com/mg979/vim-visual-multi
       let m = 'multi'
     endif
-    " Adjust to handle additional modes, which don't display correctly otherwise 
+    " keep track of mode stack
+    if get(w:, 'airline_last_m', '')[0:1] ==# 'ni' &&
+      \ mode[0] ==# 'visual'
+      if get(w:, 'airline_last_m', '')[2] ==# 'V'
+        let w:airline_sub_mode = 'vR-'
+      else
+        let w:airline_sub_mode = get(w:, 'airline_last_m', '')[2] . '-'
+      endif
+    " reset submode when going popping mode stack
+    elseif (join(mode) ==# 'normal' || (mode[0] =~# '\v(insert|replac)' &&
+        \ get(w:, 'airline_lastmode', '')[0:5] ==# 'visual'))
+      let w:airline_sub_mode = ''
+    endif
+
+    let w:airline_current_mode = get(w:, 'airline_sub_mode', '') . get(g:airline_mode_map, m, m)
+
+    if get(w:, 'airline_last_m', '') != m
+      let w:airline_last_m = m
+    endif
+    " Adjust to handle additional modes, which don't display correctly otherwise
     if index(['niI', 'niR', 'niV', 'ic', 'ix', 'Rc', 'Rv', 'Rx', 'multi'], m) == -1
       let m = m[0]
     endif
-    let w:airline_current_mode = get(g:airline_mode_map, m, m)
   else
     let mode = ['inactive']
     let w:airline_current_mode = get(g:airline_mode_map, '__')
@@ -278,6 +297,7 @@ function! airline#check_mode(winnr)
   endif
 
   let mode_string = join(mode)
+
   if get(w:, 'airline_lastmode', '') != mode_string
     call airline#highlighter#highlight_modified_inactive(context.bufnr)
     call airline#highlighter#highlight(mode, string(context.bufnr))

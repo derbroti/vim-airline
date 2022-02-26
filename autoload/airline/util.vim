@@ -50,7 +50,8 @@ function! airline#util#append(text, minwidth)
   if a:minwidth > 0 && airline#util#winwidth() < a:minwidth
     return ''
   endif
-  let prefix = s:spc == "\ua0" ? s:spc : s:spc.s:spc
+  " derbroti - 2022/01/25: hopefully this does not break things but I like it with less spaces...
+  let prefix = s:spc == "\ua0" ? s:spc : s:spc
   return empty(a:text) ? '' : prefix.g:airline_left_alt_sep.s:spc.a:text
 endfunction
 
@@ -135,7 +136,7 @@ endfunction
 
 function! airline#util#ignore_buf(name)
   let pat = '\c\v'. get(g:, 'airline#ignore_bufadd_pat', '').
-        \ get(g:, 'airline#extensions#tabline#ignore_bufadd_pat', 
+        \ get(g:, 'airline#extensions#tabline#ignore_bufadd_pat',
         \ '!|defx|gundo|nerd_tree|startify|tagbar|term://|undotree|vimfiler')
   return match(a:name, pat) > -1
 endfunction

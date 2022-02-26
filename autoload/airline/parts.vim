@@ -64,16 +64,21 @@ function! airline#parts#paste()
   return g:airline_detect_paste && &paste ? g:airline_symbols.paste : ''
 endfunction
 
-function! airline#parts#spell()
-  let spelllang = g:airline_detect_spelllang ? printf(" [%s]", toupper(substitute(&spelllang, ',', '/', 'g'))) : ''
+" derbroti 2022: separate prints for spell icon and language
+function! airline#parts#spell_icon()
+  if g:airline_detect_spell && (&spell || (exists('g:airline_spell_check_command') && eval(g:airline_spell_check_command)))
+    return g:airline_symbols.spell
+  endif
+  return ''
+endfunction
+
+" see comment above
+function! airline#parts#spell_lang()
+  let spelllang = g:airline_detect_spelllang ? printf("[%s] ", substitute(&spelllang, ',', '/', 'g')) : ''
   if g:airline_detect_spell && (&spell || (exists('g:airline_spell_check_command') && eval(g:airline_spell_check_command)))
     let winwidth = airline#util#winwidth()
-    if winwidth >= 90
-      return g:airline_symbols.spell . spelllang
-    elseif winwidth >= 70
-      return g:airline_symbols.spell
-    elseif !empty(g:airline_symbols.spell)
-      return split(g:airline_symbols.spell, '\zs')[0]
+    if winwidth >= 70
+      return spelllang
     endif
   endif
   return ''
