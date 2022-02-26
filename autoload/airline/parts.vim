@@ -5,6 +5,7 @@ scriptencoding utf-8
 
 let s:parts = {}
 
+
 " PUBLIC API {{{
 
 function! airline#parts#define(key, config)
@@ -64,6 +65,14 @@ endfunction
 
 function! airline#parts#paste()
   return g:airline_detect_paste && &paste ? g:airline_symbols.paste : ''
+endfunction
+
+" derbroti 2022: separate prints for spell icon and language
+function! airline#parts#spell_icon()
+  if g:airline_detect_spell && (&spell || (exists('g:airline_spell_check_command') && eval(g:airline_spell_check_command)))
+    return g:airline_symbols.spell
+  endif
+  return ''
 endfunction
 
 " Sources:
@@ -144,8 +153,9 @@ for s:key in keys(s:flags)
   let s:flags_noregion[split(s:key, '_')[0]] = s:flags[s:key]
 endfor
 
-function! airline#parts#spell()
-  let spelllang = g:airline_detect_spelllang ? printf(" [%s]", toupper(substitute(&spelllang, ',', '/', 'g'))) : ''
+" derbroti 2022: separate prints for spell icon and language
+function! airline#parts#spell_lang()
+  let spelllang = g:airline_detect_spelllang ? printf("[%s]", toupper(substitute(&spelllang, ',', '/', 'g'))) : ''
   if g:airline_detect_spell && (&spell || (exists('g:airline_spell_check_command') && eval(g:airline_spell_check_command)))
 
     if g:airline_detect_spelllang !=? '0' && g:airline_detect_spelllang ==? 'flag'
@@ -158,12 +168,8 @@ function! airline#parts#spell()
     endif
 
     let winwidth = airline#util#winwidth()
-    if winwidth >= 90
-      return g:airline_symbols.spell . spelllang
-    elseif winwidth >= 70
-      return g:airline_symbols.spell
-    elseif !empty(g:airline_symbols.spell)
-      return split(g:airline_symbols.spell, '\zs')[0]
+    if winwidth >= 70
+      return spelllang
     endif
   endif
   return ''
@@ -235,3 +241,32 @@ function! airline#parts#gitrepo() abort
   endif
   return reponame .. ':' .. relpath .. (&modified ? '[+]' : '')
 endfunction
+
+fun! airline#parts#adjusted_path(s1, s2)
+  let l2 = len(a:s2)
+  if !l2 | return '' | endif
+  let l1 = len(a:s1)
+  let m = min([l1, l2])
+
+  let slash = 1 " first char after last shared slash
+  for i in range(m)
+    if a:s1[i] != a:s2[i] | break           | endif
+    if a:s1[i] == '/'     | let slash = i+1 | endif
+  endfor
+  let ret = ""
+  if slash < l1
+    for i in range(slash, l1-1) | if a:s1[i] == '/' | let ret .= '../' | endif | endfor
+  endif
+  return ret . a:s2[slash : -1]
+endfun
+
+function! airline#parts#cwd()
+  return fnamemodify(getcwd(), ':p:~')
+endfunction
+
+function! airline#parts#path()
+  let cwd  = fnamemodify(getcwd(), ':p')
+  let path = expand('%:p:h') . '/'
+  return airline#parts#adjusted_path(cwd, path)
+endfunction
+

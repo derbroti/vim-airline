@@ -22,8 +22,23 @@ function! s:GetAirlineSection()
   return [section_a, section_z]
 endfunction
 
+function! s:GetAirlineSection()
+  if exists("g:airline_section_z_term")
+    let section_z = g:airline_section_z_term
+  else
+    let section_z = airline#section#create(['linenr', 'maxlinenr'])
+  endif
+
+  if exists("g:airline_section_a_term")
+    let section_a = g:airline_section_a_term
+  else
+    let section_a = airline#section#create_left(['terminal', 'tmode'])
+  endif
+  return [section_a, section_z]
+endfunction
+
 function! airline#extensions#term#apply(...) abort
-  if &buftype ==? 'terminal' || bufname(a:2.bufnr)[0] ==? '!'
+  if (&buftype ==? 'terminal' || bufname(a:2.bufnr)[0] ==? '!') && (&ft == '' || &ft != 'fzf')
     let sections = s:GetAirlineSection()
     let spc = g:airline_symbols.space
     call a:1.add_section_spaced('airline_a', sections[0])
@@ -37,7 +52,7 @@ function! airline#extensions#term#apply(...) abort
 endfunction
 
 function! airline#extensions#term#inactive_apply(...) abort
-  if getbufvar(a:2.bufnr, '&buftype') ==? 'terminal'
+  if (getbufvar(a:2.bufnr, '&buftype') ==? 'terminal') && (&ft == '' || &ft != 'fzf')
     let sections = s:GetAirlineSection()
     let spc = g:airline_symbols.space
     call a:1.add_section_spaced('airline_a', sections[0])
@@ -52,9 +67,10 @@ endfunction
 
 function! airline#extensions#term#termmode() abort
   let mode = airline#parts#mode()[0]
-  if mode ==? 'T' || mode ==? '-'
+  if mode ==? 'T' || mode ==? '-' || mode ==? 'N'
     " We don't need to output T, the statusline already says "TERMINAL".
     " Also we don't want to output "-" on an inactive statusline.
+    " Also do not print N, "TERMINAL" is the normal mode equvalent in my eyes... - derbroti
     let mode = ''
   endif
   return mode
@@ -90,6 +106,7 @@ function! s:neoterm_id(bufnr) abort
 endfunction
 
 function! airline#extensions#term#init(ext) abort
+  if &ft == 'fzf' | return | endif
   call a:ext.add_statusline_func('airline#extensions#term#apply')
   call a:ext.add_inactive_statusline_func('airline#extensions#term#inactive_apply')
 endfunction

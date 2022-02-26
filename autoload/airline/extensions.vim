@@ -78,6 +78,7 @@ function! airline#extensions#apply(...)
   endif
 
   if &buftype == 'terminal'
+    let w:airline_section_w = ''
     let w:airline_section_x = ''
     let w:airline_section_y = ''
   endif
@@ -97,6 +98,7 @@ function! airline#extensions#apply(...)
   endif
 
   if &buftype == 'help'
+    let w:airline_section_w = ''
     let w:airline_section_x = ''
     let w:airline_section_y = ''
     let w:airline_render_right = 1
@@ -486,6 +488,12 @@ function! airline#extensions#load()
   if get(g:, 'airline#extensions#searchcount#enabled', 1) && exists('*searchcount')
     call airline#extensions#searchcount#init(s:ext)
     call add(s:loaded_ext, 'searchcount')
+  endif
+
+  " derbroti 2022: add coli plugin
+  if get(g:, 'airline#extensions#coli#enabled', 0)
+    call airline#extensions#coli#init(s:ext)
+    call add(s:loaded_ext, 'coli')
   endif
 
   if get(g:, 'loaded_battery', 0) && get(g:, 'airline#extensions#battery#enabled', 0)

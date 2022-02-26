@@ -190,8 +190,12 @@ function! airline#init#bootstrap()
   call airline#parts#define_function('iminsert', 'airline#parts#iminsert')
   call airline#parts#define_function('paste', 'airline#parts#paste')
   call airline#parts#define_function('crypt', 'airline#parts#crypt')
-  call airline#parts#define_function('spell', 'airline#parts#spell')
-  call airline#parts#define_function('filetype', 'airline#parts#filetype')
+  " call airline#parts#define_function('spell', 'airline#parts#spell')
+  " split spell icon and language prints (keep icon in airline_a, move language to airline_y)
+  call airline#parts#define_function('spell_icon', 'airline#parts#spell_icon')
+  call airline#parts#define_function('spell_lang', 'airline#parts#spell_lang')
+  " is defined in vimrc to extend functionality
+  " call airline#parts#define_function('filetype', 'airline#parts#filetype')
   call airline#parts#define_function('executable', 'airline#parts#executable')
   call airline#parts#define('readonly', {
         \ 'function': 'airline#parts#readonly',
@@ -202,9 +206,9 @@ function! airline#init#bootstrap()
   elseif get(g:, 'airline_stl_path_style', 'default') ==# 'gitrepo'
     call airline#parts#define_function('file', 'airline#parts#gitrepo')
   else
-    call airline#parts#define_raw('file', airline#formatter#short_path#format('%f%m'))
+    call airline#parts#define('cwd',  {'function': 'airline#parts#cwd', 'accent': 'cwd'})
+    call airline#parts#define('file', {'function': 'airline#parts#path', 'accent': 'path'})
   endif
-  call airline#parts#define_raw('path', '%F%m')
   call airline#parts#define('linenr', {
         \ 'raw': '%{g:airline_symbols.linenr}%2l',
         \ 'accent': 'bold'})
@@ -212,7 +216,7 @@ function! airline#init#bootstrap()
         \ 'raw': '/%L%{g:airline_symbols.maxlinenr}',
         \ 'accent': 'bold'})
   call airline#parts#define('colnr', {
-        \ 'raw': '%{g:airline_symbols.colnr}%v',
+        \ 'raw': ':%{g:airline_symbols.colnr}%v',
         \ 'accent': 'bold'})
   call airline#parts#define_function('ffenc', 'airline#parts#ffenc')
   call airline#parts#define('hunks', {
@@ -229,15 +233,31 @@ function! airline#init#bootstrap()
         \ 'raw': '',
         \ 'accent': 'bold'
         \ })
-  call airline#parts#define('lsp_progress', {
+  call airline#parts#define('lsp_information_count', {
         \ 'raw': '',
-        \ 'accent': 'bold'
+        \ 'accent': 'lsp_information'
         \ })
+  call airline#parts#define('lsp_hint_count', {
+        \ 'raw': '',
+        \ 'accent': 'lsp_hint'
+        \ })
+  call airline#parts#define('lsp_warning_count', {
+        \ 'raw': '',
+        \ 'accent': 'lsp_warning'
+        \ })
+  call airline#parts#define('lsp_error_count', {
+        \ 'raw': '',
+        \ 'accent': 'lsp_error'
+        \ })
+  call airline#parts#define('async_run_running', {'raw': '', 'accent': 'running'})
+  call airline#parts#define('async_run_success', {'raw': '', 'accent': 'success'})
+  call airline#parts#define('async_run_failure', {'raw': '', 'accent': 'error'})
+
   call airline#parts#define_empty(['obsession', 'tagbar', 'syntastic-warn',
         \ 'syntastic-err', 'eclim', 'whitespace','windowswap', 'taglist',
         \ 'ycm_error_count', 'ycm_warning_count', 'neomake_error_count',
         \ 'neomake_warning_count', 'ale_error_count', 'ale_warning_count',
-        \ 'lsp_error_count', 'lsp_warning_count', 'scrollbar',
+        \ 'lsp_progress', 'lsp_error', 'lsp_status', 'filetype', 'scrollbar',
         \ 'nvimlsp_error_count', 'nvimlsp_warning_count',
         \ 'vim9lsp_warning_count', 'vim9lsp_error_count',
         \ 'languageclient_error_count', 'languageclient_warning_count',
@@ -259,51 +279,46 @@ endfunction
 function! airline#init#sections()
   let spc = g:airline_symbols.space
   if !exists('g:airline_section_a')
-    let g:airline_section_a = airline#section#create_left(['mode', 'crypt', 'paste', 'keymap', 'spell', 'capslock', 'xkblayout', 'iminsert', 'executable'])
+    let g:airline_section_a = airline#section#create_left(['mode', 'crypt', 'paste', 'keymap', 'spell_icon', 'capslock', 'xkblayout', 'iminsert', 'executable'])
   endif
   if !exists('g:airline_section_b')
-    if airline#util#winwidth() > 99
-      let g:airline_section_b = airline#section#create(['hunks', 'branch', 'battery'])
-    else
-      let g:airline_section_b = airline#section#create(['hunks', 'branch'])
-    endif
+    let g:airline_section_b = airline#section#create(['hunks', 'branch', 'async_run_success', 'async_run_running', 'async_run_failure'])
   endif
   if !exists('g:airline_section_c')
-    if exists("+autochdir") && &autochdir == 1
-      let g:airline_section_c = airline#section#create(['%<', 'path', spc, 'readonly', 'coc_status', 'lsp_progress'])
-    else
-      let g:airline_section_c = airline#section#create(['%<', 'file', spc, 'readonly', 'coc_status', 'lsp_progress'])
-    endif
+    let g:airline_section_c = airline#section#create(['%<', 'cwd', 'file', spc, 'readonly'])
   endif
   if !exists('g:airline_section_gutter')
     let g:airline_section_gutter = airline#section#create(['%='])
   endif
+  if !exists('g:airline_section_w')
+    let g:airline_section_w = airline#section#create_right(['tagbar_tag', 'tagbar'])
+  endif
   if !exists('g:airline_section_x')
-    let g:airline_section_x = airline#section#create_right(['coc_current_function', 'bookmark', 'scrollbar', 'tagbar', 'taglist', 'vista', 'gutentags', 'gen_tags', 'omnisharp', 'grepper', 'codeium', 'filetype'])
+    let g:airline_section_x = airline#section#create_right(['lsp_information_count', 'lsp_hint_count', 'lsp_warning_count', 'lsp_error_count', 'lsp_status', 'filetype'])
   endif
   if !exists('g:airline_section_y')
-    let g:airline_section_y = airline#section#create_right(['ffenc'])
+    let g:airline_section_y = airline#section#create_right(['ffenc', 'spell_lang'])
   endif
   if !exists('g:airline_section_z')
     if airline#util#winwidth() > 79
-      let g:airline_section_z = airline#section#create(['windowswap', 'obsession', '%p%%', 'linenr', 'maxlinenr', 'colnr'])
+      let g:airline_section_z = airline#section#create(['windowswap', 'obsession', 'linenr', 'colnr', 'maxlinenr'])
     else
-      let g:airline_section_z = airline#section#create(['%p%%', 'linenr', 'colnr'])
+      let g:airline_section_z = airline#section#create(['linenr', 'colnr'])
     endif
   endif
   if !exists('g:airline_section_error')
-    let g:airline_section_error = airline#section#create(['ycm_error_count', 'syntastic-err', 'eclim', 'neomake_error_count', 'ale_error_count', 'lsp_error_count', 'nvimlsp_error_count', 'languageclient_error_count', 'coc_error_count', 'vim9lsp_error_count'])
+    let g:airline_section_error = airline#section#create([])
   endif
   if airline#util#has_multiline()
     if !exists('g:airline_section_warning')
-      let g:airline_section_warning = airline#section#create(['ycm_warning_count',  'syntastic-warn', 'neomake_warning_count', 'ale_warning_count', 'lsp_warning_count', 'nvimlsp_warning_count', 'languageclient_warning_count', 'coc_warning_count', 'vim9lsp_warning_count'])
+      let g:airline_section_warning = airline#section#create([])
     endif
     if !exists('g:airline_section_warning2')
       let g:airline_section_warning2 = airline#section#create(['whitespace'])
     endif
   else
     if !exists('g:airline_section_warning')
-      let g:airline_section_warning = airline#section#create(['ycm_warning_count',  'syntastic-warn', 'neomake_warning_count', 'ale_warning_count', 'lsp_warning_count', 'nvimlsp_warning_count', 'languageclient_warning_count', 'whitespace', 'coc_warning_count', 'vim9lsp_warning_count'])
+      let g:airline_section_warning = airline#section#create(['whitespace'])
     endif
   endif
 endfunction

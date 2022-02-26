@@ -52,8 +52,7 @@ function! airline#util#append(text, minwidth)
   if a:minwidth > 0 && airline#util#winwidth() < a:minwidth
     return ''
   endif
-  let prefix = s:spc == "\ua0" ? s:spc : s:spc.s:spc
-  return empty(a:text) ? '' : prefix.g:airline_left_alt_sep.s:spc.a:text
+  return empty(a:text) ? '' : s:spc.g:airline_left_alt_sep.s:spc.a:text
 endfunction
 
 function! airline#util#warning(msg)
@@ -66,7 +65,7 @@ function! airline#util#prepend(text, minwidth)
   if a:minwidth > 0 && airline#util#winwidth() < a:minwidth
     return ''
   endif
-  return empty(a:text) ? '' : a:text.s:spc.g:airline_right_alt_sep.s:spc
+  return empty(a:text) ? '' : a:text.g:airline_right_alt_sep
 endfunction
 
 if v:version >= 704

@@ -20,16 +20,16 @@ function! airline#extensions#fzf#statusline(...) abort
   let spc = g:airline_symbols.space
 
   let builder = airline#builder#new({ 'active': 1 })
-  call builder.add_section('airline_a', spc.'FZF'.spc)
-  call builder.add_section('airline_c', '')
+  call builder.add_section('airline_a', spc.'%#airline_a_bold#FZF'.spc)
+  call builder.add_section('airline_c', "")
   return builder.build()
 endfunction
 
 function! airline#extensions#fzf#apply(...) abort
   if &filetype ==# 'fzf'
     let spc = g:airline_symbols.space
-    call a:1.add_section('airline_a', spc.'FZF'.spc)
-    call a:1.add_section('airline_c', '')
+    call a:1.add_section('airline_a', spc.'%#airline_a_bold#FZF'.spc)
+    call a:1.add_section('airline_c', "")
     return 1
   endif
 endfunction
@@ -38,7 +38,7 @@ function! airline#extensions#fzf#inactive_apply(...) abort
   if getbufvar(a:2.bufnr, '&filetype') ==# 'fzf'
     let spc = g:airline_symbols.space
     call a:1.add_section('airline_a', spc.'FZF'.spc)
-    call a:1.add_section('airline_c', '')
+    call a:1.add_section('airline_c', "")
     return 1
   endif
 endfunction

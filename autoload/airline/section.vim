@@ -4,7 +4,8 @@
 scriptencoding utf-8
 
 call airline#init#bootstrap()
-let s:spc = g:airline_symbols.space
+" no extra space...
+let s:spc = '' " g:airline_symbols.space
 
 function! s:wrap_accent(part, value)
   if exists('a:part.accent')
