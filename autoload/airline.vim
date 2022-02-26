@@ -245,7 +245,7 @@ function! airline#check_mode(winnr)
     elseif m[0] == "R"
       let mode = ['replace']  " Replace modes + submodes (R, Rc, Rv, Rx) (NB: case sensitive as 'r' is a mode)
     elseif m[0] =~ '\v(v|V||s|S|)'
-        let mode = ['visual']  " Visual and Select modes (v, V, ^V, s, S, ^S))
+      let mode = ['visual']  " Visual and Select modes (v, V, ^V, s, S, ^S))
     elseif m ==# "t"
       let mode = ['terminal']  " Terminal mode (only has one mode (t))
     elseif m[0] =~ '\v(c|r|!)'
@@ -257,11 +257,32 @@ function! airline#check_mode(winnr)
       " Vim plugin Multiple Cursors https://github.com/mg979/vim-visual-multi
       let m = 'multi'
     endif
+    " keep track of mode stack
+    if get(w:, 'airline_last_m', '')[0:1] ==# 'ni' &&
+      \ mode[0] ==# 'visual'
+      if get(w:, 'airline_last_m', '')[2] ==# 'V'
+        let w:airline_sub_mode = 'vR-'
+      else
+        let w:airline_sub_mode = get(w:, 'airline_last_m', '')[2] . '-'
+      endif
+    " TODO this does not work...
+    "elseif (m[0] ==# 'i' && get(w:, 'airline_last_m', '')[0] =~ '\v(v|V||s|S|)')
+    "  let w:airline_sub_mode = 'I-'
+    " reset submode when popping mode stack
+    elseif (mode[0] ==# 'normal' || (mode[0] =~# '\v(insert|replace)' &&
+        \ get(w:, 'airline_lastmode', '')[0:5] ==# 'visual'))
+      let w:airline_sub_mode = ''
+    endif
+
+    let w:airline_current_mode = get(w:, 'airline_sub_mode', '') . get(g:airline_mode_map, m, m)
+
+    if get(w:, 'airline_last_m', '') != m
+      let w:airline_last_m = m
+    endif
     " Adjust to handle additional modes, which don't display correctly otherwise
     if index(['niI', 'niR', 'niV', 'ic', 'ix', 'Rc', 'Rv', 'Rx', 'multi'], m) == -1
       let m = m[0]
     endif
-    let w:airline_current_mode = get(g:airline_mode_map, m, m)
   else
     let mode = ['inactive']
     let w:airline_current_mode = get(g:airline_mode_map, '__')
@@ -288,6 +309,7 @@ function! airline#check_mode(winnr)
   endif
 
   let mode_string = join(mode)
+
   if get(w:, 'airline_lastmode', '') != mode_string
     call airline#highlighter#highlight_modified_inactive(context.bufnr)
     call airline#highlighter#highlight(mode, string(context.bufnr))

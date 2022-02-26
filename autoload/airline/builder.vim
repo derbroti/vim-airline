@@ -128,24 +128,25 @@ function! s:prototype.build() dict
 endfunction
 
 function! airline#builder#should_change_group(group1, group2)
-  if a:group1 == a:group2
-    return 0
-  endif
-  let color1 = airline#highlighter#get_highlight(a:group1)
-  let color2 = airline#highlighter#get_highlight(a:group2)
-  return color1[1] != color2[1] || color1[0] != color2[0]
-      \ ||  color1[2] != color2[2] || color1[3] != color2[3]
+  return a:group1 != a:group2
+  """ if a:group1 == a:group2
+  """   return 0
+  """ endif
+  """ let color1 = airline#highlighter#get_highlight(a:group1)
+  """ let color2 = airline#highlighter#get_highlight(a:group2)
+  """ return color1[1] != color2[1] || color1[0] != color2[0]
+  """     \ ||  color1[2] != color2[2] || color1[3] != color2[3]
 endfunction
 
 function! s:get_transitioned_separator(self, prev_group, group, side)
   let line = ''
   if get(a:self._context, 'tabline', 0) && get(g:, 'airline#extensions#tabline#alt_sep', 0) && a:group ==# 'airline_tabsel' && a:side
-    call airline#highlighter#add_separator(a:prev_group, a:group, 0)
-    let line .= '%#'.a:prev_group.'_to_'.a:group.'#'
+  """   call airline#highlighter#add_separator(a:prev_group, a:group, 0)
+  """   let line .= '%#'.a:prev_group.'_to_'.a:group.'#'
     let line .=  a:self._context.right_sep.'%#'.a:group.'#'
   else
-    call airline#highlighter#add_separator(a:prev_group, a:group, a:side)
-    let line .= '%#'.a:prev_group.'_to_'.a:group.'#'
+  """   call airline#highlighter#add_separator(a:prev_group, a:group, a:side)
+  """   let line .= '%#'.a:prev_group.'_to_'.a:group.'#'
     let line .= a:side ? a:self._context.left_sep : a:self._context.right_sep
     let line .= '%#'.a:group.'#'
   endif

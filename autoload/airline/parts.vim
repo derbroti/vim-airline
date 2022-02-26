@@ -5,6 +5,7 @@ scriptencoding utf-8
 
 let s:parts = {}
 
+
 " PUBLIC API {{{
 
 function! airline#parts#define(key, config)
@@ -167,12 +168,8 @@ function! airline#parts#spell_lang()
     endif
 
     let winwidth = airline#util#winwidth()
-    if winwidth >= 90
-      return g:airline_symbols.spell . spelllang
-    elseif winwidth >= 70
-      return g:airline_symbols.spell
-    elseif !empty(g:airline_symbols.spell)
-      return split(g:airline_symbols.spell, '\zs')[0]
+    if winwidth >= 70
+      return spelllang
     endif
   endif
   return ''
@@ -244,3 +241,32 @@ function! airline#parts#gitrepo() abort
   endif
   return reponame .. ':' .. relpath .. (&modified ? '[+]' : '')
 endfunction
+
+fun! airline#parts#adjusted_path(s1, s2)
+  let l2 = len(a:s2)
+  if !l2 | return '' | endif
+  let l1 = len(a:s1)
+  let m = min([l1, l2])
+
+  let slash = 1 " first char after last shared slash
+  for i in range(m)
+    if a:s1[i] != a:s2[i] | break           | endif
+    if a:s1[i] == '/'     | let slash = i+1 | endif
+  endfor
+  let ret = ""
+  if slash < l1
+    for i in range(slash, l1-1) | if a:s1[i] == '/' | let ret .= '../' | endif | endfor
+  endif
+  return ret . a:s2[slash : -1]
+endfun
+
+function! airline#parts#cwd()
+  return fnamemodify(getcwd(), ':p:~')
+endfunction
+
+function! airline#parts#path()
+  let cwd  = fnamemodify(getcwd(), ':p')
+  let path = expand('%:p:h') . '/'
+  return airline#parts#adjusted_path(cwd, path)
+endfunction
+

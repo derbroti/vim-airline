@@ -6,6 +6,7 @@ scriptencoding utf-8
 let s:section_use_groups     = get(g:, 'airline#extensions#default#section_use_groupitems', 1)
 let s:section_truncate_width = get(g:, 'airline#extensions#default#section_truncate_width', {
       \ 'b': 79,
+      \ 'w': 80,
       \ 'x': 60,
       \ 'y': 80,
       \ 'z': 45,

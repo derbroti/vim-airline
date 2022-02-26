@@ -1,3 +1,8 @@
+# Fork Note
+
+Heavily customized version of vim-airline.
+Added serchline in tabbar, mode indicating line numbers, customized visuals.
+
 # vim-airline
 
 [![Say Thanks!](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)](https://saythanks.io/to/chrisbra)
