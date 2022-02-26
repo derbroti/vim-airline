@@ -32,32 +32,63 @@ function! airline#init#bootstrap()
   call s:check_defined('g:airline_exclude_filetypes', [])
   call s:check_defined('g:airline_exclude_preview', 0)
 
+  " If g:airline_mode_map_codes is set to 1 in your .vimrc it will display 
+  " only the modes' codes in the status line. Refer :help mode() for codes.
+  " That may be a preferred presentation because it is minimalistic.
+  call s:check_defined('g:airline_mode_map_codes', 0)
   call s:check_defined('g:airline_mode_map', {})
-  " derbroti 2022: added more map entries
-  call extend(g:airline_mode_map, {
+
+  if g:airline_mode_map_codes != 1
+    " If you prefer different mode names than those below they can be
+    " customised by inclusion in your .vimrc - for example, including just:
+    " let g:airline_mode_map = {
+    "    \ 'Rv' : 'VIRTUAL REPLACE',
+    "    \ 'niV' : 'VIRTUAL REPLACE (NORMAL)',
+    "    \ }
+    " ...would override 'Rv' and 'niV' below respectively.  
+    call extend(g:airline_mode_map, {
         \ '__' : '------',
-        \ 'multi' : 'MULTI',
-        \ 'Rvc': 'V REPLACE COMPL',
-        \ 'Rvx': 'V REPLACE COMPL',
-        \ 'ic' : 'INSERT COMPL',
-        \ 'ix' : 'INSERT COMPL',
-        \ 'ni' : '(INSERT)',
+        \ 'n' : 'NORMAL',
         \ 'no' : 'OP PENDING',
-        \ 'Rv' : 'V REPLACE',
-        \ 'Rc' : 'REPLACE COMPL',
-        \ 'Rx' : 'REPLACE COMPL',
-        \ 'R'  : 'REPLACE',
-        \ 'n'  : 'NORMAL',
-        \ 'i'  : 'INSERT',
-        \ 'c'  : 'COMMAND',
-        \ 's'  : 'SELECT',
-        \ 'S'  : 'S-LINE',
-        \ '' : 'S-BLOCK',
-        \ 't'  : 'TERMINAL',
-        \ 'v'  : 'VISUAL',
-        \ 'V'  : 'V-LINE',
+        \ 'nov' : 'OP PENDING CHAR',
+        \ 'noV' : 'OP PENDING LINE',
+        \ 'no' : 'OP PENDING BLOCK',
+        \ 'niI' : 'INSERT (NORMAL)',
+        \ 'niR' : 'REPLACE (NORMAL)',
+        \ 'niV' : 'V REPLACE (NORMAL)',
+        \ 'v' : 'VISUAL',
+        \ 'V' : 'V-LINE',
         \ '' : 'V-BLOCK',
-        \ }, 'keep')
+        \ 's' : 'SELECT',
+        \ 'S' : 'S-LINE',
+        \ '' : 'S-BLOCK',
+        \ 'i' : 'INSERT',
+        \ 'ic' : 'INSERT COMPL GENERIC',
+        \ 'ix' : 'INSERT COMPL',
+        \ 'R' : 'REPLACE',
+        \ 'Rc' : 'REPLACE COMP GENERIC',
+        \ 'Rv' : 'V REPLACE',
+        \ 'Rx' : 'REPLACE COMP',
+        \ 'c'  : 'COMMAND',
+        \ 'cv'  : 'VIM EX',
+        \ 'ce'  : 'EX',
+        \ 'r'  : 'PROMPT',
+        \ 'rm'  : 'MORE PROMPT',
+        \ 'r?'  : 'CONFIRM',
+        \ '!'  : 'SHELL',
+        \ 't'  : 'TERMINAL',
+        \ 'multi' : 'MULTI',
+        \ }, 'keep')  
+        " NB: no*, cv, ce, r? and ! do not actually display 
+  else
+    " Exception: The control character in ^S and ^V modes' codes 
+    " break the status line if allowed to render 'naturally' so 
+    " they are overridden with ^ (when g:airline_mode_map_codes = 1)
+    call extend(g:airline_mode_map, {
+        \ '' : '^V',
+        \ '' : '^S',
+        \ }, 'keep')  
+  endif
 
   call s:check_defined('g:airline_theme_map', {})
   call extend(g:airline_theme_map, {
@@ -150,10 +181,7 @@ function! airline#init#bootstrap()
   call airline#parts#define_function('iminsert', 'airline#parts#iminsert')
   call airline#parts#define_function('paste', 'airline#parts#paste')
   call airline#parts#define_function('crypt', 'airline#parts#crypt')
-  " derbroti 2022: split spell icon and language prints (keep icon in airline_a, move
-  " language to airline_z
-  call airline#parts#define_function('spell_icon', 'airline#parts#spell_icon')
-  call airline#parts#define_function('spell_lang', 'airline#parts#spell_lang')
+  call airline#parts#define_function('spell', 'airline#parts#spell')
   call airline#parts#define_function('filetype', 'airline#parts#filetype')
   call airline#parts#define('readonly', {
         \ 'function': 'airline#parts#readonly',
@@ -218,8 +246,7 @@ endfunction
 function! airline#init#sections()
   let spc = g:airline_symbols.space
   if !exists('g:airline_section_a')
-    " derbroti 2022: print only spell icon
-    let g:airline_section_a = airline#section#create_left(['mode', 'crypt', 'paste', 'keymap', 'spell_icon', 'capslock', 'xkblayout', 'iminsert'])
+    let g:airline_section_a = airline#section#create_left(['mode', 'crypt', 'paste', 'keymap', 'spell', 'capslock', 'xkblayout', 'iminsert'])
   endif
   if !exists('g:airline_section_b')
     if airline#util#winwidth() > 99
@@ -244,10 +271,9 @@ function! airline#init#sections()
   if !exists('g:airline_section_y')
     let g:airline_section_y = airline#section#create_right(['ffenc'])
   endif
-  " derbroti 2022: print spell language here
   if !exists('g:airline_section_z')
     if airline#util#winwidth() > 79
-      let g:airline_section_z = airline#section#create(['windowswap', 'obsession', 'spell_lang', '%p%%', 'linenr', 'maxlinenr', 'colnr'])
+      let g:airline_section_z = airline#section#create(['windowswap', 'obsession', '%p%%', 'linenr', 'maxlinenr', 'colnr'])
     else
       let g:airline_section_z = airline#section#create(['%p%%', 'linenr', 'colnr'])
     endif
