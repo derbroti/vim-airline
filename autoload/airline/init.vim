@@ -181,7 +181,9 @@ function! airline#init#bootstrap()
   call airline#parts#define_function('iminsert', 'airline#parts#iminsert')
   call airline#parts#define_function('paste', 'airline#parts#paste')
   call airline#parts#define_function('crypt', 'airline#parts#crypt')
-  call airline#parts#define_function('spell', 'airline#parts#spell')
+  "split spell icon and language prints (keep icon in airline_a, move language to airline_z
+  call airline#parts#define_function('spell_icon', 'airline#parts#spell_icon')
+  call airline#parts#define_function('spell_lang', 'airline#parts#spell_lang')
   call airline#parts#define_function('filetype', 'airline#parts#filetype')
   call airline#parts#define('readonly', {
         \ 'function': 'airline#parts#readonly',
@@ -246,7 +248,7 @@ endfunction
 function! airline#init#sections()
   let spc = g:airline_symbols.space
   if !exists('g:airline_section_a')
-    let g:airline_section_a = airline#section#create_left(['mode', 'crypt', 'paste', 'keymap', 'spell', 'capslock', 'xkblayout', 'iminsert'])
+    let g:airline_section_a = airline#section#create_left(['mode', 'crypt', 'paste', 'keymap', 'spell_icon', 'capslock', 'xkblayout', 'iminsert'])
   endif
   if !exists('g:airline_section_b')
     if airline#util#winwidth() > 99
@@ -273,7 +275,7 @@ function! airline#init#sections()
   endif
   if !exists('g:airline_section_z')
     if airline#util#winwidth() > 79
-      let g:airline_section_z = airline#section#create(['windowswap', 'obsession', '%p%%', 'linenr', 'maxlinenr', 'colnr'])
+      let g:airline_section_z = airline#section#create(['windowswap', 'obsession', 'spell_lang', '%p%%', 'linenr', 'maxlinenr', 'colnr'])
     else
       let g:airline_section_z = airline#section#create(['%p%%', 'linenr', 'colnr'])
     endif
