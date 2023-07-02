@@ -168,8 +168,8 @@ fun airline#extensions#coli#UnColorTabline()
   hi TabLineFill   ctermfg=238
   hi TabLine       ctermfg=Black ctermbg=238
   hi TabLineSel    ctermfg=Gray  ctermbg=234
-  hi TabLineSelMod ctermfg=55    ctermbg=234 cterm=None
-  hi TabLineMod    ctermfg=97    ctermbg=238 cterm=Bold
+  hi TabLineSelMod ctermfg=93    ctermbg=234 cterm=None
+  hi TabLineMod    ctermfg=98    ctermbg=238 cterm=Bold
   hi SearchBar     ctermfg=139   ctermbg=234 cterm=NONE
 endfun
 
