@@ -37,9 +37,10 @@ endfunction
 
 function! airline#extensions#term#termmode() abort
   let mode = airline#parts#mode()[0]
-  if mode ==? 'T' || mode ==? '-'
+  if mode ==? 'T' || mode ==? '-' || mode ==? 'N'
     " We don't need to output T, the statusline already says "TERMINAL".
     " Also we don't want to output "-" on an inactive statusline.
+    " Also do not print N, "TERMINAL" is the normal mode equvalent in my eyes... - derbroti
     let mode = ''
   endif
   return mode
