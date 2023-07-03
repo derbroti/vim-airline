@@ -8,7 +8,7 @@ if get(g:, 'loaded_coli', 0)
 endif
 
 fun! airline#extensions#coli#Cccheck()
-  if &cursorlineopt == 'line' | return | endif
+  if &cursorlineopt == 'line' || &ft == 'help' | return | endif
 
   if get(w:, 'force_abs_line', 0) || line(".") == 1
     setlocal norelativenumber
@@ -44,14 +44,14 @@ fun! airline#extensions#coli#setAbsRelHi()
 endfun
 
 fun! airline#extensions#coli#CheckWinEnterForLine()
-  if &cursorlineopt == 'line' | return | endif
+  if &cursorlineopt == 'line' || &ft == 'help' | return | endif
 
   setlocal cursorline
   call airline#extensions#coli#CheckWinForLine()
 endfun
 
 fun! airline#extensions#coli#CheckWinLeaveForLine()
-  if &cursorlineopt == 'line' | return | endif
+  if &cursorlineopt == 'line' || &ft == 'help' | return | endif
 
   setlocal nocursorline
   call airline#extensions#coli#CheckWinForLine()
@@ -85,7 +85,7 @@ endfun
 let g:debugme = ""
 
 fun! airline#extensions#coli#MakeFirstLineAbs()
-  if &cursorlineopt == 'line' | return | endif
+  if &cursorlineopt == 'line' || &ft == 'help' | return | endif
 
     let l = line(".")
     let ll = get(w:, 'my_last_line', 1)
@@ -181,8 +181,8 @@ function! airline#extensions#coli#init(ext) abort
 
     augroup numbertoggle
         autocmd!
-        autocmd InsertLeave * if &cursorlineopt != 'line' && line(".") != 1 && get(w:, 'force_abs_line', 0) != 1 | setlocal relativenumber | endif
-        autocmd InsertEnter * if &cursorlineopt != 'line' | setlocal norelativenumber | endif
+        autocmd InsertLeave * if &cursorlineopt != 'line' && &ft != 'help' && line(".") != 1 && get(w:, 'force_abs_line', 0) != 1 | setlocal relativenumber | endif
+        autocmd InsertEnter * if &cursorlineopt != 'line' && &ft != 'help' | setlocal norelativenumber | endif
         autocmd CursorMoved * :call airline#extensions#coli#MakeFirstLineAbs()
         autocmd WinEnter    * :call airline#extensions#coli#CheckWinEnterForLine()
         autocmd WinLeave    * :call airline#extensions#coli#CheckWinLeaveForLine()
@@ -200,7 +200,7 @@ function! airline#extensions#coli#apply(...) abort
 endfun
 
 function airline#extensions#coli#refresh() abort
-  if &cursorlineopt == 'line' | return | endif
+  if &cursorlineopt == 'line' || &ft == 'help' | return | endif
 
   " keep only base mode - ignore '_modified' etc.
   let m = get(w:, 'airline_lastmode', '')[0:5]
