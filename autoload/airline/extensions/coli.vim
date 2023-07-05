@@ -168,13 +168,15 @@ endfun
 
 fun airline#extensions#coli#UnColorTabline()
   call airline#extensions#coli#ColorCursorLineNr(1) "1: inactive
-  hi TabLineFill   ctermfg=238
-  hi TabLine       ctermfg=0   ctermbg=238
-  hi TabLineSel    ctermfg=1   ctermbg=234
-  hi TabLineSelMod ctermfg=93  ctermbg=234 cterm=None
-  hi TabLineMod    ctermfg=98  ctermbg=238 cterm=Bold
-  hi TabLineSess   ctermfg=245 ctermbg=240 cterm=None
-  hi SearchBar     ctermfg=139 ctermbg=234 cterm=NONE
+  hi TabLineFill      ctermfg=238
+  hi TabLine          ctermfg=0   ctermbg=238
+  hi TabLineSel       ctermfg=8   ctermbg=234
+  hi TabLineSelBuf    ctermfg=8   ctermbg=234 cterm=underline ctermul=8
+  hi TabLineSelMod    ctermfg=93  ctermbg=234 cterm=None
+  hi TabLineSelModBuf ctermfg=93  ctermbg=234 cterm=underline ctermul=93
+  hi TabLineMod       ctermfg=98  ctermbg=238 cterm=Bold
+  hi TabLineSess      ctermfg=245 ctermbg=240 cterm=None
+  hi SearchBar        ctermfg=139 ctermbg=234 cterm=NONE
 endfun
 
 function! airline#extensions#coli#init(ext) abort
