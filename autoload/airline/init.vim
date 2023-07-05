@@ -202,7 +202,7 @@ function! airline#init#bootstrap()
         \ 'raw': '/%L%{g:airline_symbols.maxlinenr}',
         \ 'accent': 'bold'})
   call airline#parts#define('colnr', {
-        \ 'raw': '%{g:airline_symbols.colnr}%v',
+        \ 'raw': ':%{g:airline_symbols.colnr}%v',
         \ 'accent': 'bold'})
   call airline#parts#define_function('ffenc', 'airline#parts#ffenc')
   call airline#parts#define('hunks', {
@@ -275,9 +275,9 @@ function! airline#init#sections()
   endif
   if !exists('g:airline_section_z')
     if airline#util#winwidth() > 79
-      let g:airline_section_z = airline#section#create(['windowswap', 'obsession', 'spell_lang', '%p%%', 'linenr', 'maxlinenr', 'colnr'])
+      let g:airline_section_z = airline#section#create(['windowswap', 'obsession', 'spell_lang', 'linenr', 'colnr', 'maxlinenr'])
     else
-      let g:airline_section_z = airline#section#create(['%p%%', 'linenr', 'colnr'])
+      let g:airline_section_z = airline#section#create(['linenr', 'colnr'])
     endif
   endif
   if !exists('g:airline_section_error')
