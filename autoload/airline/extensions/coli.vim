@@ -154,23 +154,27 @@ fun airline#extensions#coli#ColorCursorLineNr(inactive)
 endfun
 
 fun airline#extensions#coli#ColorTabline()
-  call airline#extensions#coli#ColorCursorLineNr(0)
-  hi TabLineFill   ctermfg=DarkBlue
-  hi TabLine       ctermfg=Black ctermbg=DarkBlue
-  hi TabLineSel    ctermfg=Blue  ctermbg=Black
-  hi TabLineSelMod ctermfg=129   ctermbg=Black    cterm=None
-  hi TabLineMod    ctermfg=201   ctermbg=DarkBlue cterm=Bold
-  hi SearchBar     ctermfg=13    ctermbg=0        cterm=NONE
+  call airline#extensions#coli#ColorCursorLineNr(0) "0: not_inactive
+  hi TabLineFill      ctermfg=4
+  hi TabLine          ctermfg=0   ctermbg=4   cterm=None
+  hi TabLineSel       ctermfg=12  ctermbg=0   cterm=None
+  hi TabLineSelBuf    ctermfg=12  ctermbg=0   cterm=underline ctermul=123
+  hi TabLineSelMod    ctermfg=129 ctermbg=0   cterm=None
+  hi TabLineSelModBuf ctermfg=129 ctermbg=0   cterm=underline ctermul=129
+  hi TabLineMod       ctermfg=201 ctermbg=4   cterm=Bold
+  hi TabLineSess      ctermfg=16  ctermbg=248 cterm=None
+  hi SearchBar        ctermfg=13  ctermbg=0   cterm=NONE
 endfun
 
 fun airline#extensions#coli#UnColorTabline()
-  call airline#extensions#coli#ColorCursorLineNr(1)
+  call airline#extensions#coli#ColorCursorLineNr(1) "1: inactive
   hi TabLineFill   ctermfg=238
-  hi TabLine       ctermfg=Black ctermbg=238
-  hi TabLineSel    ctermfg=Gray  ctermbg=234
-  hi TabLineSelMod ctermfg=93    ctermbg=234 cterm=None
-  hi TabLineMod    ctermfg=98    ctermbg=238 cterm=Bold
-  hi SearchBar     ctermfg=139   ctermbg=234 cterm=NONE
+  hi TabLine       ctermfg=0   ctermbg=238
+  hi TabLineSel    ctermfg=1   ctermbg=234
+  hi TabLineSelMod ctermfg=93  ctermbg=234 cterm=None
+  hi TabLineMod    ctermfg=98  ctermbg=238 cterm=Bold
+  hi TabLineSess   ctermfg=245 ctermbg=240 cterm=None
+  hi SearchBar     ctermfg=139 ctermbg=234 cterm=NONE
 endfun
 
 function! airline#extensions#coli#init(ext) abort
