@@ -10,7 +10,7 @@ endif
 fun! airline#extensions#coli#Cccheck()
   if &cursorlineopt == 'line' || &ft == 'help' | return | endif
 
-  if get(w:, 'force_abs_line', 0) || line(".") == 1
+  if get(w:, 'force_abs_line', &diff) || line(".") == 1
     setlocal norelativenumber
   else
     setlocal relativenumber
@@ -19,7 +19,8 @@ fun! airline#extensions#coli#Cccheck()
 endfun
 
 fun! airline#extensions#coli#toggleAbsRel()
-  let w:force_abs_line = !get(w:, 'force_abs_line', 0)
+  if &diff | return | endif
+  let w:force_abs_line = !get(w:, 'force_abs_line', &diff)
   call airline#extensions#coli#Cccheck()
 endfun
 
@@ -31,7 +32,7 @@ fun! airline#extensions#coli#setAbsRelHi()
   else
     " in case of <not found> we would otherwise not get rid of the print
     redrawtabline
-    if get(w:, 'force_abs_line', 0)
+    if get(w:, 'force_abs_line', &diff)
       " normal abs
       let w:coli_color = 1
       hi CursorLineNr ctermbg=190 ctermfg=17 cterm=bold
@@ -59,7 +60,7 @@ endfun
 
 fun! airline#extensions#coli#CheckWinForLine()
     let m = mode()
-    if  get(w:, 'force_abs_line', 0)
+    if  get(w:, 'force_abs_line', &diff)
         setlocal norelativenumber
         if m != 'i'
           " normal abs
@@ -93,7 +94,7 @@ fun! airline#extensions#coli#MakeFirstLineAbs()
         if l == 1
             setlocal norelativenumber
         else
-            if get(w:, 'force_abs_line', 0) != 1
+            if get(w:, 'force_abs_line', &diff) != 1
                 setlocal relativenumber
             endif
         endif
@@ -187,7 +188,7 @@ function! airline#extensions#coli#init(ext) abort
 
     augroup numbertoggle
         autocmd!
-        autocmd InsertLeave * if &cursorlineopt != 'line' && &ft != 'help' && line(".") != 1 && get(w:, 'force_abs_line', 0) != 1 | setlocal relativenumber | endif
+        autocmd InsertLeave * if &cursorlineopt != 'line' && &ft != 'help' && line(".") != 1 && get(w:, 'force_abs_line', &diff) != 1 | setlocal relativenumber | endif
         autocmd InsertEnter * if &cursorlineopt != 'line' && &ft != 'help' | setlocal norelativenumber | endif
         autocmd CursorMoved * :call airline#extensions#coli#MakeFirstLineAbs()
         autocmd WinEnter    * :call airline#extensions#coli#CheckWinEnterForLine()
@@ -231,7 +232,7 @@ function airline#extensions#coli#refresh() abort
     call airline#extensions#coli#setAbsRelHi()
     set colorcolumn=0
     :redrawstatus
-    if line(".") != 1 && ! get(w:, 'force_abs_line', 0)
+    if line(".") != 1 && ! get(w:, 'force_abs_line', &diff)
       setlocal relativenumber
     endif
   elseif m ==# 'insert'
