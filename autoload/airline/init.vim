@@ -234,6 +234,7 @@ function! airline#init#bootstrap()
 
   call airline#parts#define_text('bookmark', '')
   call airline#parts#define_text('capslock', '')
+  call airline#parts#define_text('codeium', '')
   call airline#parts#define_text('gutentags', '')
   call airline#parts#define_text('gen_tags', '')
   call airline#parts#define_text('grepper', '')
