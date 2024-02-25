@@ -53,7 +53,9 @@ endfunction
 " }}}
 
 function! airline#parts#mode()
-  return airline#util#shorten(get(w:, 'airline_current_mode', ''), 79, 1)
+  let part = airline#parts#get('mode')
+  let minwidth = get(part, 'minwidth', 79)
+  return airline#util#shorten(get(w:, 'airline_current_mode', ''), minwidth, 1)
 endfunction
 
 function! airline#parts#crypt()
@@ -72,10 +74,98 @@ function! airline#parts#spell_icon()
   return ''
 endfunction
 
-" see comment above
+" Sources:
+" https://ftp.nluug.nl/pub/vim/runtime/spell/
+" https://en.wikipedia.org/wiki/Regional_indicator_symbol
+let s:flags = {
+                  \ 'af_za': '🇿🇦[af]',
+                  \ 'am_et': '🇭🇺[am]',
+                  \ 'bg_bg': '🇧🇬',
+                  \ 'br_fr': '🇫🇷[br]',
+                  \ 'ca_es': '🇪🇸[ca]',
+                  \ 'cs_cz': '🇨🇿',
+                  \ 'cy_gb': '🇬🇧[cy]',
+                  \ 'da_dk': '🇩🇰',
+                  \ 'de'   : '🇩🇪',
+                  \ 'de_19': '🇩🇪[19]',
+                  \ 'de_20': '🇩🇪[20]',
+                  \ 'de_at': '🇩🇪[at]',
+                  \ 'de_ch': '🇩🇪[ch]',
+                  \ 'de_de': '🇩🇪',
+                  \ 'el_gr': '🇬🇷',
+                  \ 'en':    '🇬🇧',
+                  \ 'en_au': '🇦🇺',
+                  \ 'en_ca': '🇨🇦',
+                  \ 'en_gb': '🇬🇧',
+                  \ 'en_nz': '🇳🇿',
+                  \ 'en_us': '🇺🇸',
+                  \ 'es':    '🇪🇸',
+                  \ 'es_es': '🇪🇸',
+                  \ 'es_mx': '🇲🇽',
+                  \ 'fo_fo': '🇫🇴',
+                  \ 'fr_fr': '🇫🇷',
+                  \ 'ga_ie': '🇮🇪',
+                  \ 'gd_gb': '🇬🇧[gd]',
+                  \ 'gl_es': '🇪🇸[gl]',
+                  \ 'he_il': '🇮🇱',
+                  \ 'hr_hr': '🇭🇷',
+                  \ 'hu_hu': '🇭🇺',
+                  \ 'id_id': '🇮🇩',
+                  \ 'it_it': '🇮🇹',
+                  \ 'ku_tr': '🇹🇷[ku]',
+                  \ 'la'   : '🇮🇹[la]',
+                  \ 'lt_lt': '🇱🇹',
+                  \ 'lv_lv': '🇱🇻',
+                  \ 'mg_mg': '🇲🇬',
+                  \ 'mi_nz': '🇳🇿[mi]',
+                  \ 'ms_my': '🇲🇾',
+                  \ 'nb_no': '🇳🇴',
+                  \ 'nl_nl': '🇳🇱',
+                  \ 'nn_no': '🇳🇴[ny]',
+                  \ 'ny_mw': '🇲🇼',
+                  \ 'pl_pl': '🇵🇱',
+                  \ 'pt':    '🇵🇹',
+                  \ 'pt_br': '🇧🇷',
+                  \ 'pt_pt': '🇵🇹',
+                  \ 'ro_ro': '🇷🇴',
+                  \ 'ru'   : '🇷🇺',
+                  \ 'ru_ru': '🇷🇺',
+                  \ 'ru_yo': '🇷🇺[yo]',
+                  \ 'rw_rw': '🇷🇼',
+                  \ 'sk_sk': '🇸🇰',
+                  \ 'sl_si': '🇸🇮',
+                  \ 'sr_rs': '🇷🇸',
+                  \ 'sv_se': '🇸🇪',
+                  \ 'sw_ke': '🇰🇪',
+                  \ 'tet_id': '🇮🇩[tet]',
+                  \ 'th'   : '🇹🇭',
+                  \ 'tl_ph': '🇵🇭',
+                  \ 'tn_za': '🇿🇦[tn]',
+                  \ 'uk_ua': '🇺🇦',
+                  \ 'yi'   : '🇻🇮',
+                  \ 'yi_tr': '🇹🇷',
+                  \ 'zu_za': '🇿🇦[zu]',
+      \ }
+" Also support spelllang without region codes
+let s:flags_noregion = {}
+for s:key in keys(s:flags)
+  let s:flags_noregion[split(s:key, '_')[0]] = s:flags[s:key]
+endfor
+
+" derbroti 2022: separate prints for spell icon and language
 function! airline#parts#spell_lang()
-  let spelllang = g:airline_detect_spelllang ? printf("[%s] ", substitute(&spelllang, ',', '/', 'g')) : ''
+  let spelllang = g:airline_detect_spelllang ? printf(" [%s]", toupper(substitute(&spelllang, ',', '/', 'g'))) : ''
   if g:airline_detect_spell && (&spell || (exists('g:airline_spell_check_command') && eval(g:airline_spell_check_command)))
+
+    if g:airline_detect_spelllang !=? '0' && g:airline_detect_spelllang ==? 'flag'
+      let spelllang = tolower(&spelllang)
+      if has_key(s:flags, spelllang)
+        return s:flags[spelllang]
+      elseif has_key(s:flags_noregion, spelllang)
+        return s:flags_noregion[spelllang]
+      endif
+    endif
+
     let winwidth = airline#util#winwidth()
     if winwidth >= 70
       return spelllang
@@ -106,7 +196,7 @@ endfunction
 
 function! airline#parts#filetype()
   return (airline#util#winwidth() < 90 && strlen(&filetype) > 3)
-        \ ? matchstr(&filetype, '...'). (&encoding is? 'utf-8' ? '…' : '>')
+        \ ? matchstr(&filetype, '...'). (&encoding is? 'utf-8' ? "\u2026" : '>')
         \ : &filetype
 endfunction
 
