@@ -190,9 +190,10 @@ function! airline#init#bootstrap()
   call airline#parts#define_function('iminsert', 'airline#parts#iminsert')
   call airline#parts#define_function('paste', 'airline#parts#paste')
   call airline#parts#define_function('crypt', 'airline#parts#crypt')
-  "split spell icon and language prints (keep icon in airline_a, move language to airline_z
+  " split spell icon and language prints (keep icon in airline_a, move language to airline_y)
   call airline#parts#define_function('spell_icon', 'airline#parts#spell_icon')
   call airline#parts#define_function('spell_lang', 'airline#parts#spell_lang')
+  " is defined in vimrc to extend functionality
   " call airline#parts#define_function('filetype', 'airline#parts#filetype')
   call airline#parts#define_function('executable', 'airline#parts#executable')
   call airline#parts#define('readonly', {
@@ -297,11 +298,11 @@ function! airline#init#sections()
     let g:airline_section_x = airline#section#create_right(['lsp_status', 'filetype'])
   endif
   if !exists('g:airline_section_y')
-    let g:airline_section_y = airline#section#create_right(['ffenc'])
+    let g:airline_section_y = airline#section#create_right(['ffenc', 'spell_lang'])
   endif
   if !exists('g:airline_section_z')
     if airline#util#winwidth() > 79
-      let g:airline_section_z = airline#section#create(['windowswap', 'obsession', 'spell_lang', 'linenr', 'colnr', 'maxlinenr'])
+      let g:airline_section_z = airline#section#create(['windowswap', 'obsession', 'linenr', 'colnr', 'maxlinenr'])
     else
       let g:airline_section_z = airline#section#create(['linenr', 'colnr'])
     endif
