@@ -154,7 +154,7 @@ endfor
 
 " derbroti 2022: separate prints for spell icon and language
 function! airline#parts#spell_lang()
-  let spelllang = g:airline_detect_spelllang ? printf(" [%s]", toupper(substitute(&spelllang, ',', '/', 'g'))) : ''
+  let spelllang = g:airline_detect_spelllang ? printf("[%s]", toupper(substitute(&spelllang, ',', '/', 'g'))) : ''
   if g:airline_detect_spell && (&spell || (exists('g:airline_spell_check_command') && eval(g:airline_spell_check_command)))
 
     if g:airline_detect_spelllang !=? '0' && g:airline_detect_spelllang ==? 'flag'
