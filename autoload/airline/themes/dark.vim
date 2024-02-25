@@ -150,9 +150,12 @@ let g:airline#themes#dark#palette.commandline = airline#themes#generate_color_ma
 " will be red instead of the section's foreground color. You can also have
 " multiple parts with accents within a section.
 let g:airline#themes#dark#palette.accents = {
-      \ 'red': [ '#ff0000' , '' , 160 , ''  ]
+      \ 'red':             [ '#ff0000', '' , 160, '', ''],
+      \ 'lsp_information': [ '#000000', '' ,  51, '', ''],
+      \ 'lsp_hint':        [ '#000000', '' , 226, '', ''],
+      \ 'lsp_warning':     [ '#000000', '' , 208, '', 'bold'],
+      \ 'lsp_error':       [ '#000000', '' , 160, '', '']
       \ }
-
 
 " Here we define the color map for ctrlp.  We check for the g:loaded_ctrlp
 " variable so that related functionality is loaded if the user is using
@@ -164,3 +167,15 @@ if get(g:, 'loaded_ctrlp', 0)
         \ [ '#ffffff' , '#875fd7' , 231 , 98  , ''     ],
         \ [ '#5f00af' , '#ffffff' , 55  , 231 , 'bold' ])
 endif
+
+
+for mode in keys(g:airline#themes#dark#palette)
+      if mode == 'accents'
+        continue
+      endif
+      "let g:airline#themes#dark#palette[mode]['airline_information'] = [ '#000000', '#000000',  51, 234, '' ]
+      "let g:airline#themes#dark#palette[mode]['airline_hint']        = [ '#000000', '#000000', 226, 234, '' ]
+      let g:airline#themes#dark#palette[mode]['airline_warning']     = [ '#000000', '#000000', 208, 234, 'bold' ]
+      let g:airline#themes#dark#palette[mode]['airline_error']       = [ '#000000', '#000000', 160, 234, '' ]
+      " let g:airline#themes#dark#palette[mode]['airline_term']    = [ '#9cffd3', '#202020',  85, 232 ]
+endfor

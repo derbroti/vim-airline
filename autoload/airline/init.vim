@@ -32,7 +32,7 @@ function! airline#init#bootstrap()
   call s:check_defined('g:airline_exclude_filetypes', [])
   call s:check_defined('g:airline_exclude_preview', 0)
 
-  " If g:airline_mode_map_codes is set to 1 in your .vimrc it will display 
+  " If g:airline_mode_map_codes is set to 1 in your .vimrc it will display
   " only the modes' codes in the status line. Refer :help mode() for codes.
   " That may be a preferred presentation because it is minimalistic.
   call s:check_defined('g:airline_mode_map_codes', 0)
@@ -45,7 +45,7 @@ function! airline#init#bootstrap()
     "    \ 'Rv' : 'VIRTUAL REPLACE',
     "    \ 'niV' : 'VIRTUAL REPLACE (NORMAL)',
     "    \ }
-    " ...would override 'Rv' and 'niV' below respectively.  
+    " ...would override 'Rv' and 'niV' below respectively.
     call extend(g:airline_mode_map, {
         \ '__' : '------',
         \ 'n' : 'NORMAL',
@@ -78,16 +78,16 @@ function! airline#init#bootstrap()
         \ '!'  : 'SHELL',
         \ 't'  : 'TERMINAL',
         \ 'multi' : 'MULTI',
-        \ }, 'keep')  
-        " NB: no*, cv, ce, r? and ! do not actually display 
+        \ }, 'keep')
+        " NB: no*, cv, ce, r? and ! do not actually display
   else
-    " Exception: The control character in ^S and ^V modes' codes 
-    " break the status line if allowed to render 'naturally' so 
+    " Exception: The control character in ^S and ^V modes' codes
+    " break the status line if allowed to render 'naturally' so
     " they are overridden with ^ (when g:airline_mode_map_codes = 1)
     call extend(g:airline_mode_map, {
         \ '' : '^V',
         \ '' : '^S',
-        \ }, 'keep')  
+        \ }, 'keep')
   endif
 
   call s:check_defined('g:airline_theme_map', {})
@@ -184,7 +184,7 @@ function! airline#init#bootstrap()
   "split spell icon and language prints (keep icon in airline_a, move language to airline_z
   call airline#parts#define_function('spell_icon', 'airline#parts#spell_icon')
   call airline#parts#define_function('spell_lang', 'airline#parts#spell_lang')
-  call airline#parts#define_function('filetype', 'airline#parts#filetype')
+  " call airline#parts#define_function('filetype', 'airline#parts#filetype')
   call airline#parts#define('readonly', {
         \ 'function': 'airline#parts#readonly',
         \ 'accent': 'red',
@@ -219,15 +219,27 @@ function! airline#init#bootstrap()
         \ 'raw': '',
         \ 'accent': 'bold'
         \ })
-  call airline#parts#define('lsp_progress', {
+  call airline#parts#define('lsp_information_count', {
         \ 'raw': '',
-        \ 'accent': 'bold'
+        \ 'accent': 'lsp_information'
+        \ })
+  call airline#parts#define('lsp_hint_count', {
+        \ 'raw': '',
+        \ 'accent': 'lsp_hint'
+        \ })
+  call airline#parts#define('lsp_warning_count', {
+        \ 'raw': '',
+        \ 'accent': 'lsp_warning'
+        \ })
+  call airline#parts#define('lsp_error_count', {
+        \ 'raw': '',
+        \ 'accent': 'lsp_error'
         \ })
   call airline#parts#define_empty(['obsession', 'tagbar', 'syntastic-warn',
         \ 'syntastic-err', 'eclim', 'whitespace','windowswap', 'taglist',
         \ 'ycm_error_count', 'ycm_warning_count', 'neomake_error_count',
         \ 'neomake_warning_count', 'ale_error_count', 'ale_warning_count',
-        \ 'lsp_error_count', 'lsp_warning_count', 'scrollbar',
+        \ 'lsp_progress', 'lsp_status', 'filetype', 'scrollbar',
         \ 'nvimlsp_error_count', 'nvimlsp_warning_count',
         \ 'vim9lsp_warning_count', 'vim9lsp_error_count',
         \ 'languageclient_error_count', 'languageclient_warning_count',
@@ -259,9 +271,9 @@ function! airline#init#sections()
   endif
   if !exists('g:airline_section_c')
     if exists("+autochdir") && &autochdir == 1
-      let g:airline_section_c = airline#section#create(['%<', 'path', spc, 'readonly', 'coc_status', 'lsp_progress'])
+      let g:airline_section_c = airline#section#create(['%<', 'path', spc, 'readonly', 'coc_status'])
     else
-      let g:airline_section_c = airline#section#create(['%<', 'file', spc, 'readonly', 'coc_status', 'lsp_progress'])
+      let g:airline_section_c = airline#section#create(['%<', 'file', spc, 'readonly', 'coc_status'])
     endif
   endif
   if !exists('g:airline_section_gutter')
@@ -271,7 +283,7 @@ function! airline#init#sections()
     let g:airline_section_w = airline#section#create_right(['lsp_information_count', 'lsp_hint_count', 'lsp_warning_count', 'lsp_error_count'])
   endif
   if !exists('g:airline_section_x')
-    let g:airline_section_x = airline#section#create_right(['coc_current_function', 'bookmark', 'scrollbar', 'tagbar', 'taglist', 'vista', 'gutentags', 'gen_tags', 'omnisharp', 'grepper', 'filetype'])
+    let g:airline_section_x = airline#section#create_right(['lsp_status', 'filetype'])
   endif
   if !exists('g:airline_section_y')
     let g:airline_section_y = airline#section#create_right(['ffenc'])
@@ -284,9 +296,9 @@ function! airline#init#sections()
     endif
   endif
   if !exists('g:airline_section_error')
-    let g:airline_section_error = airline#section#create(['ycm_error_count', 'syntastic-err', 'eclim', 'neomake_error_count', 'ale_error_count', 'lsp_error_count', 'nvimlsp_error_count', 'languageclient_error_count', 'coc_error_count', 'vim9lsp_error_count'])
+    let g:airline_section_error = airline#section#create(['ycm_error_count', 'syntastic-err', 'eclim', 'neomake_error_count', 'ale_error_count', 'lsp_error', 'nvimlsp_error_count', 'languageclient_error_count', 'coc_error_count', 'vim9lsp_error_count'])
   endif
   if !exists('g:airline_section_warning')
-    let g:airline_section_warning = airline#section#create(['ycm_warning_count',  'syntastic-warn', 'neomake_warning_count', 'ale_warning_count', 'lsp_warning_count', 'nvimlsp_warning_count', 'languageclient_warning_count', 'whitespace', 'coc_warning_count', 'vim9lsp_warning_count'])
+    let g:airline_section_warning = airline#section#create(['ycm_warning_count',  'syntastic-warn', 'neomake_warning_count', 'ale_warning_count', 'nvimlsp_warning_count', 'languageclient_warning_count', 'whitespace', 'coc_warning_count', 'vim9lsp_warning_count'])
   endif
 endfunction
