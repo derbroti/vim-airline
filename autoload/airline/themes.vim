@@ -17,12 +17,14 @@ if !exists(":def") || !airline#util#has_vim9_script()
 
     if a:0 > 0
       call extend(palette, {
-            \ 'airline_x': [ a:1[0] , a:1[1] , a:1[2] , a:1[3] , get(a:1 , 4 , '' ) ] ,
-            \ 'airline_y': [ a:2[0] , a:2[1] , a:2[2] , a:2[3] , get(a:2 , 4 , '' ) ] ,
-            \ 'airline_z': [ a:3[0] , a:3[1] , a:3[2] , a:3[3] , get(a:3 , 4 , '' ) ] ,
+            \ 'airline_w': [ a:1[0] , a:1[1] , a:1[2] , a:1[3] , get(a:1 , 4 , '' ) ] ,
+            \ 'airline_x': [ a:2[0] , a:2[1] , a:2[2] , a:2[3] , get(a:2 , 4 , '' ) ] ,
+            \ 'airline_y': [ a:3[0] , a:3[1] , a:3[2] , a:3[3] , get(a:3 , 4 , '' ) ] ,
+            \ 'airline_z': [ a:4[0] , a:4[1] , a:4[2] , a:4[3] , get(a:4 , 4 , '' ) ] ,
             \ })
     else
       call extend(palette, {
+            \ 'airline_w': [ a:sect3[0] , a:sect3[1] , a:sect3[2] , a:sect3[3] , '' ] ,
             \ 'airline_x': [ a:sect3[0] , a:sect3[1] , a:sect3[2] , a:sect3[3] , '' ] ,
             \ 'airline_y': [ a:sect2[0] , a:sect2[1] , a:sect2[2] , a:sect2[3] , '' ] ,
             \ 'airline_z': [ a:sect1[0] , a:sect1[1] , a:sect1[2] , a:sect1[3] , '' ] ,
@@ -96,6 +98,7 @@ else
       }
 
     extend(palette, {
+      'airline_w': [ sect3[0], sect3[1], sect3[2], sect3[3], '' ],
       'airline_x': [ sect3[0], sect3[1], sect3[2], sect3[3], '' ],
       'airline_y': [ sect2[0], sect2[1], sect2[2], sect2[3], '' ],
       'airline_z': [ sect1[0], sect1[1], sect1[2], sect1[3], '' ],

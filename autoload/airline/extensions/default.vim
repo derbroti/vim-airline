@@ -6,6 +6,7 @@ scriptencoding utf-8
 let s:section_use_groups     = get(g:, 'airline#extensions#default#section_use_groupitems', 1)
 let s:section_truncate_width = get(g:, 'airline#extensions#default#section_truncate_width', {
       \ 'b': 79,
+      \ 'w': 80,
       \ 'x': 60,
       \ 'y': 88,
       \ 'z': 45,
@@ -14,7 +15,7 @@ let s:section_truncate_width = get(g:, 'airline#extensions#default#section_trunc
       \ })
 let s:layout = get(g:, 'airline#extensions#default#layout', [
       \ [ 'a', 'b', 'c' ],
-      \ [ 'x', 'y', 'z', 'warning', 'error' ]
+      \ [ 'w', 'x', 'y', 'z', 'warning', 'error']
       \ ])
 
 function! s:get_section(winnr, key, ...)

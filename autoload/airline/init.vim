@@ -267,6 +267,9 @@ function! airline#init#sections()
   if !exists('g:airline_section_gutter')
     let g:airline_section_gutter = airline#section#create(['%='])
   endif
+  if !exists('g:airline_section_w')
+    let g:airline_section_w = airline#section#create_right(['lsp_information_count', 'lsp_hint_count', 'lsp_warning_count', 'lsp_error_count'])
+  endif
   if !exists('g:airline_section_x')
     let g:airline_section_x = airline#section#create_right(['coc_current_function', 'bookmark', 'scrollbar', 'tagbar', 'taglist', 'vista', 'gutentags', 'gen_tags', 'omnisharp', 'grepper', 'filetype'])
   endif

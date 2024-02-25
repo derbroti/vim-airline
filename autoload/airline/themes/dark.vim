@@ -65,8 +65,9 @@ let g:airline#themes#dark#palette = {}
 let s:airline_a_normal   = [ '#00005f' , '#dfff00' , 17  , 190 ]
 let s:airline_b_normal   = [ '#ffffff' , '#444444' , 255 , 238 ]
 let s:airline_c_normal   = [ '#9cffd3' , '#202020' , 85  , 234 ]
-let s:airline_x_normal   = [ '#9cffd3' , '#202020' , 77  , 234 ]
-let g:airline#themes#dark#palette.normal = airline#themes#generate_color_map(s:airline_a_normal, s:airline_b_normal, s:airline_c_normal, s:airline_x_normal, s:airline_b_normal, s:airline_a_normal)
+let s:airline_x_normal   = [ '#9cffd3' , '#202020' , 77  , 236 ]
+let s:airline_w_normal   = [ '#9cffd3' , '#202020' , 255 , 234 ]
+let g:airline#themes#dark#palette.normal = airline#themes#generate_color_map(s:airline_a_normal, s:airline_b_normal, s:airline_c_normal, s:airline_w_normal, s:airline_x_normal, s:airline_b_normal, s:airline_a_normal)
 
 " It should be noted the above is equivalent to:
 " let g:airline#themes#dark#palette.normal = airline#themes#generate_color_map(
@@ -128,7 +129,8 @@ let g:airline#themes#dark#palette.visual_modified = {
 let s:airline_a_inactive = [ '#4e4e4e' , '#1c1c1c' , 239 , 234 , '' ]
 let s:airline_b_inactive = [ '#4e4e4e' , '#262626' , 239 , 235 , '' ]
 let s:airline_c_inactive = [ '#4e4e4e' , '#303030' , 239 , 235 , '' ]
-let g:airline#themes#dark#palette.inactive = airline#themes#generate_color_map(s:airline_a_inactive, s:airline_b_inactive, s:airline_c_inactive)
+let s:airline_w_inactive = [ '#4e4e4e' , '#303030' , 239 , 235 , '' ]
+let g:airline#themes#dark#palette.inactive = airline#themes#generate_color_map(s:airline_a_inactive, s:airline_b_inactive, s:airline_c_inactive, s:airline_w_inactive, s:airline_c_inactive, s:airline_b_inactive, s:airline_a_inactive)
 let g:airline#themes#dark#palette.inactive_modified = {
       \ 'airline_c': [ '#875faf' , '' , 97 , '' , '' ] ,
       \ }
