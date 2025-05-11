@@ -32,7 +32,7 @@ function! airline#init#bootstrap()
   call s:check_defined('g:airline_exclude_filetypes', [])
   call s:check_defined('g:airline_exclude_preview', 0)
 
-  " If g:airline_mode_map_codes is set to 1 in your .vimrc it will display 
+  " If g:airline_mode_map_codes is set to 1 in your .vimrc it will display
   " only the modes' codes in the status line. Refer :help mode() for codes.
   " That may be a preferred presentation because it is minimalistic.
   call s:check_defined('g:airline_mode_map_codes', 0)
@@ -45,7 +45,7 @@ function! airline#init#bootstrap()
     "    \ 'Rv' : 'VIRTUAL REPLACE',
     "    \ 'niV' : 'VIRTUAL REPLACE (NORMAL)',
     "    \ }
-    " ...would override 'Rv' and 'niV' below respectively.  
+    " ...would override 'Rv' and 'niV' below respectively.
     call extend(g:airline_mode_map, {
         \ '__' : '------',
         \ 'n' : 'NORMAL',
@@ -78,16 +78,16 @@ function! airline#init#bootstrap()
         \ '!'  : 'SHELL',
         \ 't'  : 'TERMINAL',
         \ 'multi' : 'MULTI',
-        \ }, 'keep')  
-        " NB: no*, cv, ce, r? and ! do not actually display 
+        \ }, 'keep')
+        " NB: no*, cv, ce, r? and ! do not actually display
   else
-    " Exception: The control character in ^S and ^V modes' codes 
-    " break the status line if allowed to render 'naturally' so 
+    " Exception: The control character in ^S and ^V modes' codes
+    " break the status line if allowed to render 'naturally' so
     " they are overridden with ^ (when g:airline_mode_map_codes = 1)
     call extend(g:airline_mode_map, {
         \ '' : '^V',
         \ '' : '^S',
-        \ }, 'keep')  
+        \ }, 'keep')
   endif
 
   call s:check_defined('g:airline_theme_map', {})
@@ -136,6 +136,7 @@ function! airline#init#bootstrap()
           \ 'notexists': "\u0246",
           \ 'dirty': "\u26a1",
           \ 'crypt': nr2char(0x1F512),
+          \ 'executable': "\u2699",
           \ }, 'keep')
     "  Note: If "\u2046" (Ɇ) does not show up, try to use "\u2204" (∄)
     if exists("*setcellwidths")
@@ -160,6 +161,7 @@ function! airline#init#bootstrap()
           \ 'notexists': "\u0246",
           \ 'crypt': nr2char(0x1F512),
           \ 'dirty': '!',
+          \ 'executable': "\u2699",
           \ }, 'keep')
   else
     " Symbols for ASCII terminals
@@ -177,6 +179,7 @@ function! airline#init#bootstrap()
           \ 'notexists': '?',
           \ 'crypt': 'cr',
           \ 'dirty': '!',
+          \ 'executable': 'x',
           \ }, 'keep')
   endif
 
@@ -187,8 +190,11 @@ function! airline#init#bootstrap()
   call airline#parts#define_function('iminsert', 'airline#parts#iminsert')
   call airline#parts#define_function('paste', 'airline#parts#paste')
   call airline#parts#define_function('crypt', 'airline#parts#crypt')
-  call airline#parts#define_function('spell', 'airline#parts#spell')
-  call airline#parts#define_function('filetype', 'airline#parts#filetype')
+  "split spell icon and language prints (keep icon in airline_a, move language to airline_z
+  call airline#parts#define_function('spell_icon', 'airline#parts#spell_icon')
+  call airline#parts#define_function('spell_lang', 'airline#parts#spell_lang')
+  " call airline#parts#define_function('filetype', 'airline#parts#filetype')
+  call airline#parts#define_function('executable', 'airline#parts#executable')
   call airline#parts#define('readonly', {
         \ 'function': 'airline#parts#readonly',
         \ 'accent': 'red',
