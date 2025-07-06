@@ -78,6 +78,7 @@ function! airline#extensions#apply(...)
   endif
 
   if &buftype == 'terminal'
+    let w:airline_section_w = ''
     let w:airline_section_x = ''
     let w:airline_section_y = ''
   endif
@@ -97,6 +98,7 @@ function! airline#extensions#apply(...)
   endif
 
   if &buftype == 'help'
+    let w:airline_section_w = ''
     let w:airline_section_x = ''
     let w:airline_section_y = ''
     let w:airline_render_right = 1

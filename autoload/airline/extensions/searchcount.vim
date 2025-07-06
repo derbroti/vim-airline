@@ -9,10 +9,30 @@ if !exists('*searchcount')
   finish
 endif
 
+let s:airline_searchcount_timer = 0
+let s:airline_searchcount_last_update = 0
+let s:airline_searchcount_force_update = 0
+
+function! airline#extensions#searchcount#updateTimer(id)
+  " needs to be set before refresh is called
+  let s:airline_searchcount_timer += 1
+
+  " force only if we are no longer in command mode, i.e., changing the search term
+  if mode() ==# 'c'
+    return
+  endif
+
+  if s:airline_searchcount_force_update == 1
+    call airline#extensions#searchcount#refresh()
+    " is evaluated in refresh - reset only after call!
+    let s:airline_searchcount_force_update = 0
+  endif
+endfunction
+
 " from https://github.com/mox-mox/vim-localsearch
 function! airline#extensions#searchcount#localsearchSet()
   let g:last_search = @/
-  let @/ = get(w:, 'last_search', '')
+  let @/ = get(t:, 'last_search', '')
 endfunction
 function! airline#extensions#searchcount#localsearchUnset()
   let w:last_search = @/
@@ -21,6 +41,7 @@ endfunction
 
 function airline#extensions#searchcount#init(ext)
   call a:ext.add_statusline_func('airline#extensions#searchcount#apply')
+  call timer_start(250, function('airline#extensions#searchcount#updateTimer'), {'repeat': -1})
 
   augroup localsearch
     autocmd!
@@ -49,12 +70,12 @@ function airline#extensions#searchcount#refresh()
     let w:airline_last_term = ''
   else
     if get(w:, 'airline_last_term', '') != getreg('/')
+      call airline#extensions#searchcount#status()
       call airline#extensions#searchcount#refresh_redraw()
       let w:airline_last_idx = -1
       let w:airline_last_term = getreg('/')
-    elseif v:hlsearch
-      " triggers once incsearch is complete
-      call airline#extensions#searchcount#status(1)
+    elseif v:hlsearch " 'search term did not changed' case
+      call airline#extensions#searchcount#status()
       if get(w:, 'airline_idx_changed', 1)
         call airline#extensions#searchcount#refresh_redraw()
       endif
@@ -69,29 +90,28 @@ endfun
 
 
 function airline#extensions#searchcount#apply(...)
-  call airline#extensions#append_to_section('z',
-        \ '%{ airline#extensions#searchcount#refresh() }')
+  call airline#extensions#append_to_section('z', '%{airline#extensions#searchcount#refresh()}')
 endfunction
 
 
 function! s:search_term()
-  let show_search_term = get(g:, 'airline#extensions#searchcount#show_search_term', 1)
   let search_term_limit = get(g:, 'airline#extensions#searchcount#search_term_limit', 8)
-
-  if show_search_term == 0
-    return ''
-  endif
   " shorten for all width smaller than 300 (this is just a guess)
   " this uses a non-breaking space, because it looks like
   " a leading space is stripped :/
   return "\ua0" .  '/' . airline#util#shorten(getreg('/'), 300, search_term_limit)
 endfunction
 
-function airline#extensions#searchcount#status(recomp)
+function airline#extensions#searchcount#status()
   "let g:statuscalled += 1
   let w:airline_not_found = 0
   try
-    let result = searchcount(#{recompute: a:recomp, maxcount: -1})
+    let l:recomp = s:airline_searchcount_timer != s:airline_searchcount_last_update
+    let s:airline_searchcount_force_update = !l:recomp
+    let s:airline_searchcount_last_update = s:airline_searchcount_timer
+
+    let result = searchcount(#{recompute: l:recomp, maxcount: -1})
+
     if empty(result) || result.total ==# 0
       let w:airline_last_idx = -1
       let w:airline_idx_changed = 0
@@ -113,6 +133,7 @@ function airline#extensions#searchcount#status(recomp)
     endif
     let w:airline_result = printf('%s [%d/%d]', <SID>search_term(),
           \		result.current, result.total)
+
     if get(w:, 'airline_last_idx', -1) != result.current
       let w:airline_last_idx = result.current
       let w:airline_idx_changed = 1

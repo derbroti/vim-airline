@@ -1,6 +1,8 @@
 " vim: et ts=2 sts=2 sw=2
 " MIT License. Copyright (c) 2022 Mirko Palmer
 
+"TODO au ModeChanged and au OptionSet
+
 scriptencoding utf-8
 
 if get(g:, 'loaded_coli', 0)
@@ -8,7 +10,7 @@ if get(g:, 'loaded_coli', 0)
 endif
 
 fun! airline#extensions#coli#Cccheck()
-  if &cursorlineopt == 'line' || &ft == 'help' | return | endif
+  if &cursorlineopt == 'line' || &ft == 'help' || &ft == 'ctrlsf' | return | endif
 
   if get(w:, 'force_abs_line', &diff) || line(".") == 1
     setlocal norelativenumber
@@ -45,14 +47,14 @@ fun! airline#extensions#coli#setAbsRelHi()
 endfun
 
 fun! airline#extensions#coli#CheckWinEnterForLine()
-  if &cursorlineopt == 'line' || &ft == 'help' | return | endif
+  if &cursorlineopt == 'line' || &ft == 'help' || &ft == 'ctrlsf' | return | endif
 
   setlocal cursorline
   call airline#extensions#coli#CheckWinForLine()
 endfun
 
 fun! airline#extensions#coli#CheckWinLeaveForLine()
-  if &cursorlineopt == 'line' || &ft == 'help' | return | endif
+  if &cursorlineopt == 'line' || &ft == 'help' || &ft == 'ctrlsf' | return | endif
 
   setlocal nocursorline
   call airline#extensions#coli#CheckWinForLine()
@@ -86,7 +88,7 @@ endfun
 let g:debugme = ""
 
 fun! airline#extensions#coli#MakeFirstLineAbs()
-  if &cursorlineopt == 'line' || &ft == 'help' | return | endif
+  if &cursorlineopt == 'line' || &ft == 'help' || &ft == 'ctrlsf' | return | endif
 
     let l = line(".")
     let ll = get(w:, 'my_last_line', 1)
@@ -137,9 +139,6 @@ fun airline#extensions#coli#ColorCursorLineNr(inactive)
       hi CursorLineNr ctermbg=214 ctermfg=16 cterm=bold
     endif
   elseif l:a == 6 " command
-    """
-    " Note: will not happen as we do not get a focus lost when in command mode
-    "
     if a:inactive
       hi CursorLineNr ctermbg=247 ctermfg=17 cterm=bold
     else
@@ -156,40 +155,37 @@ endfun
 
 fun airline#extensions#coli#ColorTabline()
   call airline#extensions#coli#ColorCursorLineNr(0) "0: active
-  hi TabLineFill       ctermfg=4
-  hi TabLine           ctermfg=0   ctermbg=4
-  hi TabLineSel        ctermfg=0   ctermbg=39
-  hi TabLineSelBuf     ctermfg=0   ctermbg=39  cterm=underline ctermul=8
-  hi TabLineSelMod     ctermfg=93  ctermbg=234 cterm=None
-  hi TabLineSelModBuf  ctermfg=93  ctermbg=234 cterm=underline ctermul=93
-  hi TabLineMod        ctermfg=98  ctermbg=4   cterm=Bold
-  hi TabLineSessionSep ctermfg=245 ctermbg=240 cterm=None
-  hi SearchBar         ctermfg=13  ctermbg=0   cterm=NONE
+  hi TabLineFill       ctermfg=None ctermbg=17  cterm=None
+  hi TabLine           ctermfg=245   ctermbg=20  cterm=None
+  hi TabLineSep        ctermfg=27   ctermbg=17  cterm=None
+  hi TabLineSel        ctermfg=15   ctermbg=26  cterm=None
+  hi TabLineSelSep     ctermfg=26   ctermbg=17  cterm=None
+  hi TabLineSelBuf     ctermfg=0    ctermbg=27  cterm=None
+  hi TabLineSelMod     ctermfg=93   ctermbg=250 cterm=None
+  hi TabLineSelModBuf  ctermfg=93   ctermbg=234 cterm=underline ctermul=93
+  hi TabLineMod        ctermfg=98   ctermbg=27  cterm=Bold
+  hi TabLineSession    ctermfg=46   ctermbg=20  cterm=None
+  hi TabLineSessionSep ctermfg=20   ctermbg=17  cterm=None
+  hi SearchBar         ctermfg=13   ctermbg=0   cterm=NONE
 endfun
 
+" TODO... add inactive colors...
 fun airline#extensions#coli#UnColorTabline()
   call airline#extensions#coli#ColorCursorLineNr(1) "1: inactive
-  hi TabLineFill       ctermfg=238
-  hi TabLine           ctermfg=0   ctermbg=238
-  hi TabLineSel        ctermfg=8   ctermbg=234
-  hi TabLineSelBuf     ctermfg=8   ctermbg=234 cterm=underline ctermul=8
-  hi TabLineSelMod     ctermfg=93  ctermbg=234 cterm=None
-  hi TabLineSelModBuf  ctermfg=93  ctermbg=234 cterm=underline ctermul=93
-  hi TabLineMod        ctermfg=98  ctermbg=238 cterm=Bold
-  hi TabLineSessionSep ctermfg=245 ctermbg=240 cterm=None
-  hi SearchBar         ctermfg=139 ctermbg=234 cterm=NONE
+  return
 endfun
 
 function! airline#extensions#coli#init(ext) abort
   " normal
   hi CursorLineNr ctermbg=234 ctermfg=11 cterm=None
+  """ hi ColorColumn ctermbg=None
 
   call a:ext.add_statusline_func('airline#extensions#coli#apply')
 
     augroup numbertoggle
         autocmd!
-        autocmd InsertLeave * if &cursorlineopt != 'line' && &ft != 'help' && line(".") != 1 && get(w:, 'force_abs_line', &diff) != 1 | setlocal relativenumber | endif
-        autocmd InsertEnter * if &cursorlineopt != 'line' && &ft != 'help' | setlocal norelativenumber | endif
+        autocmd InsertLeave * if &cursorlineopt != 'line' && &ft != 'help' && &ft != 'ctrlsf' && line(".") != 1 && get(w:, 'force_abs_line', &diff) != 1 | setlocal relativenumber | endif
+        autocmd InsertEnter * if &cursorlineopt != 'line' && &ft != 'help' && &ft != 'ctrlsf' | setlocal norelativenumber | endif
         autocmd CursorMoved * :call airline#extensions#coli#MakeFirstLineAbs()
         autocmd WinEnter    * :call airline#extensions#coli#CheckWinEnterForLine()
         autocmd WinLeave    * :call airline#extensions#coli#CheckWinLeaveForLine()
@@ -202,12 +198,13 @@ function! airline#extensions#coli#init(ext) abort
 endfunction
 
 function! airline#extensions#coli#apply(...) abort
+    if &cursorlineopt == 'line' || &ft == 'help' || &ft == 'ctrlsf' | return | endif
     call airline#extensions#append_to_section('a',
           \ '%{airline#extensions#coli#refresh()}')
 endfun
 
 function airline#extensions#coli#refresh() abort
-  if &cursorlineopt == 'line' || &ft == 'help' | return | endif
+  if &cursorlineopt == 'line' || &ft == 'help' || &ft == 'ctrlsf' | return '' | endif
 
   " keep only base mode - ignore '_modified' etc.
   let m = get(w:, 'airline_lastmode', '')[0:5]
@@ -226,11 +223,11 @@ function airline#extensions#coli#refresh() abort
     let w:coli_last_mode = m
   endif
 
-  let &colorcolumn = get(g:, 'airline#extensions#coli#columns', 0)
+  """ hi ColorColumn ctermbg=235
 
   if m ==# 'normal'
     call airline#extensions#coli#setAbsRelHi()
-    set colorcolumn=0
+    """ hi ColorColumn ctermbg=None
     :redrawstatus
     if line(".") != 1 && ! get(w:, 'force_abs_line', &diff)
       setlocal relativenumber
@@ -252,10 +249,10 @@ function airline#extensions#coli#refresh() abort
     :redrawstatus
   elseif m ==# 'comman'
     let w:coli_search_line = line(".")
-    set colorcolumn=0
+    """ hi ColorColumn ctermbg=None
     let w:coli_color = 6
     hi CursorLineNr ctermbg=40 ctermfg=17 cterm=bold
-    :redrawstatus
+    :redraw
     let w:coli_mode_changed = 0
   endif
 

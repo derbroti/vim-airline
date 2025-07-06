@@ -14,9 +14,9 @@ let s:init=0
 " Arguments: current, sort, fname
 function! airline#extensions#tagbar#get_status(...)
   let builder = airline#builder#new({ 'active': a:1 })
-  call builder.add_section('airline_a', s:spc.'Tagbar'.s:spc)
-  call builder.add_section('airline_b', s:spc.a:2.s:spc)
-  call builder.add_section('airline_c', s:spc.a:3.s:spc)
+  call builder.add_section('airline_a', '%#airline_a_bold#'.s:spc.'Tags'.s:spc)
+  call builder.add_section('airline_b', s:spc.'Sort by '.a:2.s:spc)
+  "call builder.add_section('airline_c', s:spc.a:3.s:spc)
   return builder.build()
 endfunction
 
@@ -50,15 +50,31 @@ function! airline#extensions#tagbar#currenttag()
       let s:airline_tagbar_last_lookup_val = tagbar#currenttag('%s', '', flags,
             \ get(g:, 'airline#extensions#tagbar#searchmethod', 'nearest-stl'))
       let s:airline_tagbar_last_lookup_time = localtime()
+      let split_lookup_val = split(s:airline_tagbar_last_lookup_val, '::')
+      if len(split_lookup_val) > 1
+        let s:airline_tagbar_last_lookup_val = (len(split_lookup_val) > 2 ? '::' : '') . join(split_lookup_val[-2:-1], '::')
+      endif
+      let s:airline_tagbar_last_lookup_val = substitute(s:airline_tagbar_last_lookup_val, "__anon[a-f0-9]*", "[anon]", '')
     endif
     return s:airline_tagbar_last_lookup_val
   endif
   return ''
 endfunction
 
+function! airline#extensions#tagbar#currenttagstack()
+    let l:tag = gettagstack()
+    let l:tag_len = l:tag['length']
+    let l:tag_idx = l:tag['curidx'] - 1 " index is on the next free slot
+    if l:tag_len > 0 && l:tag_idx > 0
+      return l:tag_idx . "⋮ "
+    endif
+    return ''
+endfunction
+
 function! airline#extensions#tagbar#init(ext)
   call a:ext.add_inactive_statusline_func('airline#extensions#tagbar#inactive_apply')
   let g:tagbar_status_func = 'airline#extensions#tagbar#get_status'
 
-  call airline#parts#define_function('tagbar', 'airline#extensions#tagbar#currenttag')
+  call airline#parts#define('tagbar', {'function': 'airline#extensions#tagbar#currenttag', 'accent': 'tagbar'})
+  call airline#parts#define('tagbar_tag', {'function': 'airline#extensions#tagbar#currenttagstack', 'accent': 'tagbar_tag'})
 endfunction

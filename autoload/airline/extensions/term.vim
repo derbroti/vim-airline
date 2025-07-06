@@ -23,7 +23,7 @@ function! s:GetAirlineSection()
 endfunction
 
 function! airline#extensions#term#apply(...) abort
-  if &buftype ==? 'terminal' || bufname(a:2.bufnr)[0] ==? '!'
+  if (&buftype ==? 'terminal' || bufname(a:2.bufnr)[0] ==? '!') && (&ft == '' || &ft != 'fzf')
     let sections = s:GetAirlineSection()
     let spc = g:airline_symbols.space
     call a:1.add_section_spaced('airline_a', sections[0])
@@ -37,7 +37,7 @@ function! airline#extensions#term#apply(...) abort
 endfunction
 
 function! airline#extensions#term#inactive_apply(...) abort
-  if getbufvar(a:2.bufnr, '&buftype') ==? 'terminal'
+  if (getbufvar(a:2.bufnr, '&buftype') ==? 'terminal') && (&ft == '' || &ft != 'fzf')
     let sections = s:GetAirlineSection()
     let spc = g:airline_symbols.space
     call a:1.add_section_spaced('airline_a', sections[0])
@@ -91,6 +91,7 @@ function! s:neoterm_id(bufnr) abort
 endfunction
 
 function! airline#extensions#term#init(ext) abort
+  if &ft == 'fzf' | return | endif
   call a:ext.add_statusline_func('airline#extensions#term#apply')
   call a:ext.add_inactive_statusline_func('airline#extensions#term#inactive_apply')
 endfunction
