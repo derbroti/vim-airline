@@ -22,6 +22,21 @@ function! s:GetAirlineSection()
   return [section_a, section_z]
 endfunction
 
+function! s:GetAirlineSection()
+  if exists("g:airline_section_z_term")
+    let section_z = g:airline_section_z_term
+  else
+    let section_z = airline#section#create(['linenr', 'maxlinenr'])
+  endif
+
+  if exists("g:airline_section_a_term")
+    let section_a = g:airline_section_a_term
+  else
+    let section_a = airline#section#create_left(['terminal', 'tmode'])
+  endif
+  return [section_a, section_z]
+endfunction
+
 function! airline#extensions#term#apply(...) abort
   if &buftype ==? 'terminal' || bufname(a:2.bufnr)[0] ==? '!'
     let sections = s:GetAirlineSection()
