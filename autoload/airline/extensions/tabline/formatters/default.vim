@@ -77,7 +77,7 @@ else
     var result = buf_nr_show ? printf(buf_nr_format, bufnr) : ''
     result ..= substitute(buffer_name, '\\', '/', 'g')
 
-    if getbufvar(bufnr, '&modified')
+    if getbufvar(bufnr, '&modified') == 1
       result ..= g:airline_symbols.modified
     endif
     return result

@@ -8,6 +8,7 @@ if !exists(':TagbarToggle')
   finish
 endif
 
+let s:flags = get(g:, 'airline#extensions#tagbar#flags', '')
 let s:spc = g:airline_symbols.space
 let s:init=0
 
@@ -34,21 +35,15 @@ function! airline#extensions#tagbar#currenttag()
       try
         " try to load the plugin, if filetypes are disabled,
         " this will cause an error, so try only once
-        let a = tagbar#currenttag('%s', '', '')
+        let a=tagbar#currenttag('%', '', '')
       catch
       endtry
       unlet! a
       let s:init=1
     endif
-    let cursize = getfsize(fnamemodify(bufname('%'), ':p'))
-    if cursize > 0 && cursize > get(g:, 'airline#extensions#tagbar#max_filesize', 1024 * 1024)
-      return ''
-    endif
-    let flags = get(g:, 'airline#extensions#tagbar#flags', '')
     " function tagbar#currenttag does not exist, if filetype is not enabled
     if s:airline_tagbar_last_lookup_time != localtime() && exists("*tagbar#currenttag")
-      let s:airline_tagbar_last_lookup_val = tagbar#currenttag('%s', '', flags,
-            \ get(g:, 'airline#extensions#tagbar#searchmethod', 'nearest-stl'))
+      let s:airline_tagbar_last_lookup_val = tagbar#currenttag('%s', '', s:flags, get(g:, 'airline#extensions#tagbar#searchmethod', 'nearest-stl'))
       let s:airline_tagbar_last_lookup_time = localtime()
       let split_lookup_val = split(s:airline_tagbar_last_lookup_val, '::')
       if len(split_lookup_val) > 1

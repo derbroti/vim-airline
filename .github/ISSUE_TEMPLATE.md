@@ -8,10 +8,7 @@
 if you are using terminal:
 - terminal: ????
 - $TERM variable: ???
-- terminal columns size: ???
-- terminal line size: ???
 - color configuration (:set t_Co?):
-
 if you are using Neovim:
 - does it happen in Vim: ???
 

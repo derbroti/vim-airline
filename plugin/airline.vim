@@ -48,7 +48,6 @@ function! s:init()
 endfunction
 
 let s:active_winnr = -1
-
 function! s:on_window_changed(event)
   " don't trigger for Vim popup windows
   if &buftype is# 'popup'
@@ -68,27 +67,14 @@ function! s:on_window_changed(event)
         \ && &ft !~? 'gitcommit'
     " fugitive is special, it changes names and filetypes several times,
     " make sure the caching does not get into its way
-    if a:event ==# 'BufUnload'
-      " in the BufUnload event, make sure the cacheing does not prevent
-      " removing stale entries
-      call airline#highlighter#remove_separators_for_bufnr(expand('<abuf>'))
-    endif
     return
   endif
   let g:airline_last_window_changed = l:key
   call s:init()
   call airline#update_statusline()
-
-  if a:event ==# 'BufUnload'
-    call airline#highlighter#remove_separators_for_bufnr(expand('<abuf>'))
-  endif
 endfunction
 
 function! s:on_focus_gained()
-  if &eventignore =~? 'focusgained'
-    return
-  endif
-
   if airline#util#try_focusgained()
     unlet! w:airline_lastmode | :call <sid>airline_refresh(1)
   endif
@@ -162,7 +148,7 @@ function! s:airline_toggle()
       autocmd CursorMoved * call <sid>on_cursor_moved()
 
       autocmd VimResized * call <sid>on_focus_gained()
-      if exists('*timer_start') && exists('*funcref') && &eventignore !~? 'focusgained'
+      if exists('*timer_start') && exists('*funcref')
         " do not trigger FocusGained on startup, it might erase the intro screen (see #1817)
         " needs funcref() (needs 7.4.2137) and timers (7.4.1578)
         let Handler=funcref('<sid>FocusGainedHandler')
@@ -187,18 +173,12 @@ function! s:airline_toggle()
         " Force update of tabline more often
         autocmd InsertEnter,InsertLeave,CursorMovedI * :call airline#update_tabline()
       endif
-
-      if exists("##ModeChanged")
-        autocmd ModeChanged * :call airline#update_tabline()
-      endif
     augroup END
 
     if !airline#util#stl_disabled(winnr())
       if &laststatus < 2
         let _scroll=&scroll
-        if !get(g:, 'airline_statusline_ontop', 0)
-          set laststatus=2
-        endif
+        set laststatus=2
         if &scroll != _scroll
           let &scroll = _scroll
         endif
@@ -251,7 +231,7 @@ function! s:airline_refresh(...)
 endfunction
 
 function! s:FocusGainedHandler(timer)
-  if exists("s:timer") && a:timer == s:timer && exists('#airline') && &eventignore !~? 'focusgained'
+  if exists("s:timer") && a:timer == s:timer && exists('#airline')
     augroup airline
       au FocusGained * call s:on_focus_gained()
     augroup END

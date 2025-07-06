@@ -8,7 +8,7 @@ let s:section_truncate_width = get(g:, 'airline#extensions#default#section_trunc
       \ 'b': 79,
       \ 'w': 80,
       \ 'x': 60,
-      \ 'y': 80,
+      \ 'y': 88,
       \ 'z': 45,
       \ 'warning': 80,
       \ 'error': 80,

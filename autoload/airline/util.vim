@@ -18,9 +18,7 @@ let s:focusgained_ignore_time = 0
 " actually changed.
 function! airline#util#winwidth(...) abort
   let nr = get(a:000, 0, 0)
-  " When statusline is on top, or using global statusline for Neovim
-  " always return the number of columns
-  if get(g:, 'airline_statusline_ontop', 0) || &laststatus > 2
+  if get(g:, 'airline_statusline_ontop', 0)
     return &columns
   else
     return winwidth(nr)
@@ -143,7 +141,7 @@ endfunction
 
 function! airline#util#has_fugitive()
   if !exists("s:has_fugitive")
-    let s:has_fugitive = exists('*FugitiveHead')
+    let s:has_fugitive = exists('*fugitive#head') || exists('*FugitiveHead')
   endif
   return s:has_fugitive
 endfunction
@@ -179,12 +177,7 @@ function! airline#util#doautocmd(event)
     " airline disabled
     return
   endif
-  try
-    exe printf("silent doautocmd %s User %s", s:nomodeline, a:event)
-  catch /^Vim\%((\a\+)\)\=:E48:/
-    " Catch: Sandbox mode
-    " no-op
-  endtry
+  exe printf("silent doautocmd %s User %s", s:nomodeline, a:event)
 endfunction
 
 function! airline#util#themes(match)
@@ -215,7 +208,7 @@ function! airline#util#is_popup_window(winnr)
    if exists('*win_gettype')
      return win_gettype(a:winnr) ==# 'popup' || win_gettype(a:winnr) ==# 'autocmd'
    else
-      return airline#util#getwinvar(a:winnr, '&buftype', '') ==# 'popup'
+      return getwinvar(a:winnr, '&buftype', '') ==# 'popup'
   endif
 endfunction
 
@@ -232,7 +225,6 @@ endfunction
 function! airline#util#has_vim9_script()
   " Returns true, if Vim is new enough to understand vim9 script
   return (exists(":def") &&
-    \ exists("v:versionlong") &&
     \ v:versionlong >= 8022844 &&
     \ get(g:, "airline_experimental", 0))
 endfunction

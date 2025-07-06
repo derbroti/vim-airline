@@ -96,10 +96,12 @@ endfunction
 
 function! s:search_term()
   let search_term_limit = get(g:, 'airline#extensions#searchcount#search_term_limit', 8)
+
   " shorten for all width smaller than 300 (this is just a guess)
   " this uses a non-breaking space, because it looks like
   " a leading space is stripped :/
-  return "\ua0" .  '/' . airline#util#shorten(getreg('/'), 300, search_term_limit)
+  " return "\ua0" .  '/' . airline#util#shorten(getreg('/'), 300, 8)
+  return "\ua0" . getreg('/')
 endfunction
 
 function airline#extensions#searchcount#status()
@@ -120,7 +122,6 @@ function airline#extensions#searchcount#status()
     endif
     if result.incomplete ==# 1     " timed out
       let w:airline_result = printf('%s [?/??]', <SID>search_term())
-      return printf('%s [?/??]', s:search_term())
     elseif result.incomplete ==# 2 " max count exceeded
       if result.total > result.maxcount &&
             \  result.current > result.maxcount
