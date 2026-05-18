@@ -93,8 +93,7 @@ let g:airline#themes#dark#palette.normal = airline#themes#generate_color_map(s:a
 " applied after g:airline#themes#dark#palette.normal, hence why only certain keys are
 " declared.
 let g:airline#themes#dark#palette.normal_modified = {
-      \ 'airline_c': [ '#ffffff' , '#5f005f' , 255     , 53      , ''     ] ,
-      \ }
+    \ 'airline_c': [ '', '', 92, 234, '' ], 'airline_c_path': [ '', '', 135, '234', '' ]}
 
 
 let s:airline_a_insert = [ '#00005f' , '#00dfff' , 17  , 45  ]
